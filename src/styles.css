@@ -34,22 +34,6 @@ th {
     background-color: #f4f4f4;
 }
 
-.progress-bar {
-    width: 100%;
-    height: 20px;
-    background-color: #f0f0f0;
-    border-radius: 10px;
-    margin: 20px 0;
-    overflow: hidden;
-}
-
-.progress-fill {
-    height: 100%;
-    background-color: #4CAF50;
-    width: 0%;
-    transition: width 0.3s ease;
-}
-
 button {
     padding: 10px 20px;
     border: none;
@@ -84,4 +68,116 @@ select, input {
 .success {
     background-color: #e8f5e9;
     color: #2e7d32;
+}
+
+/* Stats container styles */
+.stats-container {
+    margin: 20px 0;
+    padding: 15px;
+    background-color: #f5f5f5;
+    border-radius: 5px;
+}
+
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 15px;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px;
+    background-color: white;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.stat-item label {
+    font-weight: bold;
+    color: #666;
+}
+
+.stat-item span {
+    color: #333;
+    font-family: monospace;
+}
+
+.progress-container {
+    margin-top: 10px;
+}
+
+.progress {
+    width: 100%;
+    height: 25px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progress-fill {
+    width: 0%;
+    height: 100%;
+    background-color: #4CAF50;
+    transition: width 0.3s ease;
+}
+
+#progressPercentage {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+    z-index: 1;
+}
+
+.language-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 10px 0;
+}
+
+.lang-button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    border: 2px solid #ddd;
+    border-radius: 4px;
+    background-color: #f8f9fa;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-weight: 500;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.lang-button img {
+    width: 20px;
+    height: auto;
+}
+
+.lang-button[data-selected="true"] {
+    background-color: #2196F3;
+    border-color: #1976D2;
+    color: white;
+    box-shadow: 0 2px 4px rgba(33,150,243,0.3);
+}
+
+.lang-button:hover {
+    border-color: #2196F3;
+    background-color: #e3f2fd;
+    color: #1976D2;
+}
+
+.lang-button[data-selected="true"]:hover {
+    background-color: #1976D2;
+    color: white;
 } 

@@ -25,43 +25,163 @@
             <input type="password" id="openaiApiKey" placeholder="Enter your OpenAI API key">
         </div>
         <div>
-            <label for="sourceLang">Source Language:</label>
-            <select id="sourceLang">
-                <option value="en-GB">English</option>
-                <option value="fr-FR">French</option>
-                <option value="es-ES">Spanish</option>
-                <option value="de-DE">German</option>
-                <option value="it-IT">Italian</option>
-                <option value="nl-NL">Dutch</option>
-                <option value="bg-BG">Bulgarian</option>
-                <option value="hu-HU">Hungarian</option>
-                <option value="ro-RO">Romanian</option>
-                <option value="cs-CZ">Czech</option>
-                <option value="zh-CN">Chinese</option>
-                <option value="el-GR">Greek</option>
-            </select>
+            <label>Source Language:</label>
+            <div class="language-grid" id="sourceLangGrid">
+                <!-- Germanic languages -->
+                <button type="button" class="lang-button" data-lang="en-GB" data-selected="true">
+                    <img src="https://flagcdn.com/w20/gb.png" alt="English">
+                    English
+                </button>
+                <button type="button" class="lang-button" data-lang="de-DE">
+                    <img src="https://flagcdn.com/w20/de.png" alt="German">
+                    German
+                </button>
+                <button type="button" class="lang-button" data-lang="nl-NL">
+                    <img src="https://flagcdn.com/w20/nl.png" alt="Dutch">
+                    Dutch
+                </button>
+
+                <!-- Romance languages -->
+                <button type="button" class="lang-button" data-lang="fr-FR">
+                    <img src="https://flagcdn.com/w20/fr.png" alt="French">
+                    French
+                </button>
+                <button type="button" class="lang-button" data-lang="es-ES">
+                    <img src="https://flagcdn.com/w20/es.png" alt="Spanish">
+                    Spanish
+                </button>
+                <button type="button" class="lang-button" data-lang="it-IT">
+                    <img src="https://flagcdn.com/w20/it.png" alt="Italian">
+                    Italian
+                </button>
+                <button type="button" class="lang-button" data-lang="ro-RO">
+                    <img src="https://flagcdn.com/w20/ro.png" alt="Romanian">
+                    Romanian
+                </button>
+
+                <!-- Slavic languages -->
+                <button type="button" class="lang-button" data-lang="cs-CZ">
+                    <img src="https://flagcdn.com/w20/cz.png" alt="Czech">
+                    Czech
+                </button>
+                <button type="button" class="lang-button" data-lang="bg-BG">
+                    <img src="https://flagcdn.com/w20/bg.png" alt="Bulgarian">
+                    Bulgarian
+                </button>
+
+                <!-- Other Indo-European -->
+                <button type="button" class="lang-button" data-lang="el-GR">
+                    <img src="https://flagcdn.com/w20/gr.png" alt="Greek">
+                    Greek
+                </button>
+
+                <!-- Uralic languages -->
+                <button type="button" class="lang-button" data-lang="hu-HU">
+                    <img src="https://flagcdn.com/w20/hu.png" alt="Hungarian">
+                    Hungarian
+                </button>
+
+                <!-- East Asian languages -->
+                <button type="button" class="lang-button" data-lang="zh-CN">
+                    <img src="https://flagcdn.com/w20/cn.png" alt="Chinese">
+                    Chinese
+                </button>
+            </div>
         </div>
         <div>
-            <label for="targetLang">Target Language:</label>
-            <select id="targetLang">
-                <option value="">Select language...</option>
-                <option value="en-GB">English</option>
-                <option value="fr-FR">French</option>
-                <option value="es-ES">Spanish</option>
-                <option value="de-DE">German</option>
-                <option value="it-IT">Italian</option>
-                <option value="nl-NL">Dutch</option>
-                <option value="bg-BG">Bulgarian</option>
-                <option value="hu-HU">Hungarian</option>
-                <option value="ro-RO">Romanian</option>
-                <option value="cs-CZ">Czech</option>
-                <option value="zh-CN">Chinese</option>
-                <option value="el-GR">Greek</option>
-            </select>
+            <label>Target Language:</label>
+            <div class="language-grid" id="targetLangGrid">
+                <!-- Germanic languages -->
+                <button type="button" class="lang-button" data-lang="en-GB">
+                    <img src="https://flagcdn.com/w20/gb.png" alt="English">
+                    English
+                </button>
+                <button type="button" class="lang-button" data-lang="de-DE">
+                    <img src="https://flagcdn.com/w20/de.png" alt="German">
+                    German
+                </button>
+                <button type="button" class="lang-button" data-lang="nl-NL">
+                    <img src="https://flagcdn.com/w20/nl.png" alt="Dutch">
+                    Dutch
+                </button>
+
+                <!-- Romance languages -->
+                <button type="button" class="lang-button" data-lang="fr-FR">
+                    <img src="https://flagcdn.com/w20/fr.png" alt="French">
+                    French
+                </button>
+                <button type="button" class="lang-button" data-lang="es-ES">
+                    <img src="https://flagcdn.com/w20/es.png" alt="Spanish">
+                    Spanish
+                </button>
+                <button type="button" class="lang-button" data-lang="it-IT">
+                    <img src="https://flagcdn.com/w20/it.png" alt="Italian">
+                    Italian
+                </button>
+                <button type="button" class="lang-button" data-lang="ro-RO">
+                    <img src="https://flagcdn.com/w20/ro.png" alt="Romanian">
+                    Romanian
+                </button>
+
+                <!-- Slavic languages -->
+                <button type="button" class="lang-button" data-lang="cs-CZ">
+                    <img src="https://flagcdn.com/w20/cz.png" alt="Czech">
+                    Czech
+                </button>
+                <button type="button" class="lang-button" data-lang="bg-BG">
+                    <img src="https://flagcdn.com/w20/bg.png" alt="Bulgarian">
+                    Bulgarian
+                </button>
+
+                <!-- Other Indo-European -->
+                <button type="button" class="lang-button" data-lang="el-GR">
+                    <img src="https://flagcdn.com/w20/gr.png" alt="Greek">
+                    Greek
+                </button>
+
+                <!-- Uralic languages -->
+                <button type="button" class="lang-button" data-lang="hu-HU">
+                    <img src="https://flagcdn.com/w20/hu.png" alt="Hungarian">
+                    Hungarian
+                </button>
+
+                <!-- East Asian languages -->
+                <button type="button" class="lang-button" data-lang="zh-CN">
+                    <img src="https://flagcdn.com/w20/cn.png" alt="Chinese">
+                    Chinese
+                </button>
+            </div>
         </div>
         <div>
             <label for="batchSize">Batch Size:</label>
             <input type="number" id="batchSize" value="10" min="1" max="50">
+        </div>
+        <div>
+            <label>
+                <input type="checkbox" id="ignoreBlank" checked>
+                Ignore blank source entries
+            </label>
+        </div>
+    </div>
+
+    <div class="stats-container">
+        <h3>Statistics</h3>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <label>Total Entries:</label>
+                <span id="totalEntries">0</span>
+            </div>
+            <div class="stat-item">
+                <label>Translated Entries:</label>
+                <span id="translatedEntries">0</span>
+            </div>
+        </div>
+        <div class="progress-container">
+            <div class="progress">
+                <div class="progress-fill" id="progressFill">
+                    <span id="progressPercentage">0%</span>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -92,7 +212,7 @@
     </table>
 
     <script>
-        let openaiClient = null;
+        // Initialize all global variables
         let currentData = {
             englishSource: {},
             originalTranslations: {},
@@ -101,194 +221,345 @@
             currentBatch: 0,
             batchSize: 10,
             targetLang: '',
-            sourceLang: 'en',  // Default to English
+            sourceLang: 'en-GB',
             processedKeys: new Set()
         };
+        
+        let openaiClient = null;
 
-        // Initialize UI elements
-        const startBtn = document.getElementById('startBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const saveBtn = document.getElementById('saveBtn');
-        const statusDiv = document.getElementById('status');
-        const progressFill = document.querySelector('.progress-fill');
-        const translationTable = document.getElementById('translationTable');
+        // Define all necessary functions
+        function savePreferences() {
+            const preferences = {
+                sourceLang: getSelectedLanguage('sourceLangGrid'),
+                targetLang: getSelectedLanguage('targetLangGrid'),
+                batchSize: document.getElementById('batchSize').value,
+                ignoreBlank: document.getElementById('ignoreBlank').checked,
+                locoApiKey: document.getElementById('locoApiKey').value,
+                openaiApiKey: document.getElementById('openaiApiKey').value
+            };
+            console.log('Saving preferences:', { ...preferences, locoApiKey: '***', openaiApiKey: '***' });
+            localStorage.setItem('translationPreferences', JSON.stringify(preferences));
+        }
 
-        // Load saved API keys on page load
-        document.addEventListener('DOMContentLoaded', () => {
-            const savedLocoKey = localStorage.getItem('locoApiKey');
-            const savedOpenAIKey = localStorage.getItem('openaiApiKey');
+        function getSelectedLanguage(gridId) {
+            const selectedButton = document.querySelector(`#${gridId} .lang-button[data-selected="true"]`);
+            console.log('Getting selected language for', gridId, ':', selectedButton?.dataset.lang);
+            return selectedButton ? selectedButton.dataset.lang : null;
+        }
+
+        function getSelectedLanguageName(gridId) {
+            const selectedButton = document.querySelector(`#${gridId} .lang-button[data-selected="true"]`);
+            console.log('Getting selected language name for', gridId, ':', selectedButton?.textContent.trim());
+            return selectedButton ? selectedButton.textContent.trim() : null;
+        }
+
+        function updateTableHeaders() {
+            const headerRow = document.querySelector('table thead tr');
+            const sourceLangName = getSelectedLanguageName('sourceLangGrid');
+            const targetLangName = getSelectedLanguageName('targetLangGrid');
             
-            if (savedLocoKey) {
-                document.getElementById('locoApiKey').value = savedLocoKey;
+            if (sourceLangName && targetLangName) {
+                headerRow.innerHTML = `
+                    <th>Asset ID</th>
+                    <th>${sourceLangName} (Source)</th>
+                    <th>${targetLangName} (Original Translation)</th>
+                    <th>${targetLangName} (New Translation)</th>
+                `;
             }
-            if (savedOpenAIKey) {
-                document.getElementById('openaiApiKey').value = savedOpenAIKey;
-            }
-        });
+        }
 
-        startBtn.addEventListener('click', async () => {
+        function loadSavedPreferences() {
             try {
-                const locoApiKey = document.getElementById('locoApiKey').value;
-                const openaiApiKey = document.getElementById('openaiApiKey').value;
-                const targetLang = document.getElementById('targetLang').value;
-                const sourceLang = document.getElementById('sourceLang').value;
-                const batchSize = parseInt(document.getElementById('batchSize').value);
-
-                if (!locoApiKey || !openaiApiKey || !targetLang || !sourceLang) {
-                    showStatus('Please fill in all required fields', 'error');
-                    return;
-                }
-
-                showStatus('Downloading translations...', 'success');
+                const savedPreferences = JSON.parse(localStorage.getItem('translationPreferences')) || {};
+                console.log('Loading saved preferences:', { ...savedPreferences, locoApiKey: '***', openaiApiKey: '***' });
                 
-                const response = await fetch(`http://localhost:3000/api/translations?key=${encodeURIComponent(locoApiKey)}`);
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
+                // Load API keys
+                if (savedPreferences.locoApiKey) {
+                    document.getElementById('locoApiKey').value = savedPreferences.locoApiKey;
+                }
+                if (savedPreferences.openaiApiKey) {
+                    document.getElementById('openaiApiKey').value = savedPreferences.openaiApiKey;
                 }
                 
-                const data = await response.json();
-                console.log('Received data:', data);
-
-                // Initialize OpenAI client
-                openaiClient = new window.OpenAI({
-                    apiKey: openaiApiKey,
-                    dangerouslyAllowBrowser: true
-                });
-
-                // Reset everything for new session with the correct source data
-                currentData = {
-                    englishSource: data[sourceLang] || {},  // Use selected source language
-                    originalTranslations: data[targetLang] || {},
-                    translations: {},
-                    totalEntries: Object.keys(data[sourceLang] || {}).length,
-                    currentBatch: 0,
-                    batchSize: batchSize,
-                    targetLang: targetLang,
-                    sourceLang: sourceLang,
-                    processedKeys: new Set()
-                };
-
-                console.log('Initialized currentData:', {
-                    sourceEntriesCount: Object.keys(currentData.englishSource).length,
-                    targetEntriesCount: Object.keys(currentData.originalTranslations).length,
-                    sourceLang,
-                    targetLang
-                });
-
-                // Enable next batch button if we have entries to process
-                nextBtn.disabled = currentData.totalEntries === 0;
-                startBtn.disabled = true;
+                // Load language selections
+                if (savedPreferences.sourceLang) {
+                    const sourceButton = document.querySelector(`#sourceLangGrid .lang-button[data-lang="${savedPreferences.sourceLang}"]`);
+                    if (sourceButton) {
+                        document.querySelectorAll('#sourceLangGrid .lang-button').forEach(btn => {
+                            btn.dataset.selected = 'false';
+                        });
+                        sourceButton.dataset.selected = 'true';
+                    }
+                }
                 
-                showStatus('Ready to start translations. Click "Next Batch" to begin.', 'success');
+                if (savedPreferences.targetLang) {
+                    const targetButton = document.querySelector(`#targetLangGrid .lang-button[data-lang="${savedPreferences.targetLang}"]`);
+                    if (targetButton) {
+                        document.querySelectorAll('#targetLangGrid .lang-button').forEach(btn => {
+                            btn.dataset.selected = 'false';
+                        });
+                        targetButton.dataset.selected = 'true';
+                    }
+                }
+                
+                // Load other preferences
+                document.getElementById('batchSize').value = savedPreferences.batchSize || 10;
+                document.getElementById('ignoreBlank').checked = savedPreferences.ignoreBlank !== false;
+                
+                updateTableHeaders();
             } catch (error) {
-                console.error('Error:', error);
-                showStatus('Error: ' + error.message, 'error');
-                startBtn.disabled = false;
+                console.error('Error loading preferences:', error);
             }
+        }
+
+        // Wait for DOM to be fully loaded
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize language buttons
+            initLanguageButtons();
+            
+            // Load saved preferences
+            loadSavedPreferences();
+
+            // Add start button handler
+            const startBtn = document.getElementById('startBtn');
+            startBtn.addEventListener('click', async () => {
+                try {
+                    const locoApiKey = document.getElementById('locoApiKey').value;
+                    const openaiApiKey = document.getElementById('openaiApiKey').value;
+                    const targetLang = getSelectedLanguage('targetLangGrid');
+                    const sourceLang = getSelectedLanguage('sourceLangGrid');
+                    const batchSize = parseInt(document.getElementById('batchSize').value);
+                    const ignoreBlank = document.getElementById('ignoreBlank').checked;
+
+                    // Save preferences before starting
+                    savePreferences();
+
+                    if (!locoApiKey || !openaiApiKey || !targetLang || !sourceLang) {
+                        showStatus('Please fill in all required fields and select both languages', 'error');
+                        return;
+                    }
+
+                    // Show loading status
+                    showStatus('Fetching translations from Localise...', 'info');
+
+                    // Use the proxy endpoint instead of direct Localise API call
+                    const response = await fetch(`/api/translations?key=${encodeURIComponent(locoApiKey)}`);
+
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.status} ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    console.log('Received data:', data);
+
+                    // Flatten the source data
+                    let sourceData = data[sourceLang] || {};
+                    sourceData = flattenObject(sourceData);
+                    
+                    if (ignoreBlank) {
+                        sourceData = Object.fromEntries(
+                            Object.entries(sourceData).filter(([_, value]) => 
+                                value && typeof value === 'string' && value.trim() !== ''
+                            )
+                        );
+                    }
+
+                    // Initialize OpenAI client
+                    openaiClient = new OpenAI({
+                        apiKey: openaiApiKey,
+                        dangerouslyAllowBrowser: true
+                    });
+
+                    // Reset everything for new session
+                    currentData = {
+                        englishSource: sourceData,
+                        originalTranslations: flattenObject(data[targetLang] || {}),
+                        translations: {},
+                        totalEntries: Object.keys(sourceData).length,
+                        currentBatch: 0,
+                        batchSize: batchSize,
+                        targetLang: targetLang,
+                        sourceLang: sourceLang,
+                        processedKeys: new Set()
+                    };
+
+                    // Update UI state
+                    startBtn.disabled = true;
+                    const nextBtn = document.getElementById('nextBtn');
+                    const saveBtn = document.getElementById('saveBtn');
+                    nextBtn.disabled = currentData.totalEntries === 0;
+                    saveBtn.disabled = true;
+
+                    // Clear existing table
+                    const translationTable = document.getElementById('translationTable');
+                    translationTable.innerHTML = '';
+
+                    // Update table headers
+                    updateTableHeaders();
+
+                    // Update statistics
+                    updateStatistics();
+
+                    showStatus(`Loaded ${currentData.totalEntries} entries. Click "Next Batch" to begin translation.`, 'success');
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    showStatus('Error: ' + error.message, 'error');
+                    startBtn.disabled = false;
+                }
+            });
+
+            // Add change handlers for API key inputs
+            document.getElementById('locoApiKey').addEventListener('change', savePreferences);
+            document.getElementById('openaiApiKey').addEventListener('change', savePreferences);
+            document.getElementById('batchSize').addEventListener('change', savePreferences);
+            document.getElementById('ignoreBlank').addEventListener('change', savePreferences);
+
+            // Add Next button handler
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.addEventListener('click', () => {
+                processBatch();
+            });
+
+            // Add Save button handler
+            const saveBtn = document.getElementById('saveBtn');
+            saveBtn.addEventListener('click', async () => {
+                try {
+                    showStatus('Preparing translations for download...', 'info');
+                    
+                    // Create an object with translations and unflatten it
+                    const exportData = {
+                        [currentData.targetLang]: unflattenObject(currentData.translations)
+                    };
+
+                    // Create a Blob with the JSON data
+                    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+                    
+                    // Create a download link
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = URL.createObjectURL(blob);
+                    downloadLink.download = `translations_${currentData.targetLang}_${new Date().toISOString().split('T')[0]}.json`;
+                    
+                    // Trigger the download
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                    
+                    showStatus('Translations downloaded successfully!', 'success');
+
+                } catch (error) {
+                    console.error('Error preparing download:', error);
+                    showStatus('Error preparing download: ' + error.message, 'error');
+                }
+            });
         });
 
-        async function translateText(text, targetLang) {
-            if (!text || text.trim() === '') return '';
+        function initLanguageButtons() {
+            // Source language buttons
+            document.querySelectorAll('#sourceLangGrid .lang-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    console.log('Source button clicked:', button.textContent);
+                    
+                    document.querySelectorAll('#sourceLangGrid .lang-button').forEach(btn => {
+                        btn.dataset.selected = 'false';
+                    });
+                    
+                    button.dataset.selected = 'true';
+                    currentData.sourceLang = button.dataset.lang;
+                    
+                    savePreferences();
+                    updateTableHeaders();
+                });
+            });
 
+            // Target language buttons
+            document.querySelectorAll('#targetLangGrid .lang-button').forEach(button => {
+                button.addEventListener('click', () => {
+                    console.log('Target button clicked:', button.textContent);
+                    
+                    document.querySelectorAll('#targetLangGrid .lang-button').forEach(btn => {
+                        btn.dataset.selected = 'false';
+                    });
+                    
+                    button.dataset.selected = 'true';
+                    currentData.targetLang = button.dataset.lang;
+                    
+                    savePreferences();
+                    updateTableHeaders();
+                });
+            });
+        }
+
+        // Add status display function
+        function showStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('status');
+            statusDiv.textContent = message;
+            statusDiv.className = 'status ' + type;
+        }
+
+        // Add translateText function
+        async function translateText(text, targetLang) {
             try {
                 const completion = await openaiClient.chat.completions.create({
                     messages: [
                         {
                             role: "system",
-                            content: `You are a professional translator for a B2B foreign exchange and cross-border payments platform. 
-                            
-Important rules:
-- Translate content for medium-sized businesses in a professional tone
-- Preserve ALL variables without translation, including:
-  * %variable%
-  * %%variable%%
-  * {{variable}}
-  * \${variable}  
-- DO NOT translate:
-  * HTML tags
-  * URLs
-  
-Context: The platform handles currency conversion, international payments, and financial operations for business clients.
-
-Target language: ${targetLang}`
+                            content: `You are a professional translator. Translate the following text to ${targetLang}. Maintain any HTML tags, placeholders, or special characters. Only return the translation, nothing else.`
                         },
                         {
                             role: "user",
                             content: text
                         }
                     ],
-                    model: "gpt-4",
-                    temperature: 0.7
+                    model: "gpt-3.5-turbo",
                 });
 
-                console.log('Translation request ID:', completion.id);
                 return completion.choices[0].message.content.trim();
             } catch (error) {
-                console.error('OpenAI API Error:', error);
-                if (error.response) {
-                    console.error('Response:', error.response.data);
-                }
-                throw new Error(`Translation error: ${error.message}`);
+                console.error('Translation error:', error);
+                throw new Error(`Translation failed: ${error.message}`);
             }
         }
 
+        // Update processBatch function
         async function processBatch() {
-            console.log('Current Data:', {
-                totalEntries: currentData.totalEntries,
-                processedKeys: Array.from(currentData.processedKeys),
-                sourceDataSize: Object.keys(currentData.englishSource).length,
-                currentBatch: currentData.currentBatch
-            });
-
-            const allEntries = Object.entries(currentData.englishSource);
-            const unprocessedEntries = allEntries
-                .filter(([key]) => !currentData.processedKeys.has(key));
-            
-            console.log('Entries:', {
-                allEntriesCount: allEntries.length,
-                unprocessedCount: unprocessedEntries.length
-            });
-
-            const entries = unprocessedEntries.slice(0, currentData.batchSize);
-
-            if (entries.length === 0) {
-                showStatus('All translations completed!', 'success');
-                nextBtn.disabled = true;
-                return;
-            }
-
             try {
-                showStatus('Translating batch...', 'success');
+                // Get next batch of unprocessed entries
+                const entries = Object.entries(currentData.englishSource)
+                    .filter(([key]) => !currentData.processedKeys.has(key))
+                    .slice(0, currentData.batchSize);
+
+                if (entries.length === 0) {
+                    showStatus('All entries processed!', 'success');
+                    document.getElementById('nextBtn').disabled = true;
+                    return;
+                }
+
+                showStatus('Processing batch...', 'info');
+
                 const results = {};
-                
-                for (const [key, sourceText] of entries) {
+                for (const [key, value] of entries) {
                     try {
-                        if (typeof sourceText === 'object') {
-                            console.warn(`Skipping key ${key} - invalid source text:`, sourceText);
-                            continue;
-                        }
+                        showStatus(`Translating entry ${currentData.processedKeys.size + 1}/${currentData.totalEntries}...`, 'info');
+                        results[key] = await translateText(value, currentData.targetLang);
+                        currentData.processedKeys.add(key);
+                        currentData.translations[key] = results[key];
                         
-                        results[key] = await translateText(sourceText, currentData.targetLang);
-                        currentData.processedKeys.add(key);  // Mark as processed
-                        // Update table after each successful translation
-                        updateTable([[key, sourceText]], { [key]: results[key] });
+                        // Update table after each translation
+                        updateTable([[key, value]], { [key]: results[key] });
                     } catch (error) {
-                        console.error(`Error translating key ${key}:`, error);
-                        results[key] = `ERROR: ${error.message}`;
-                        currentData.processedKeys.add(key);  // Mark as processed even if it failed
+                        console.error('Error translating:', key, error);
+                        showStatus(`Error translating entry: ${error.message}`, 'error');
                     }
                 }
-                
-                // Update translations
-                Object.assign(currentData.translations, results);
-                
-                // Update progress
-                currentData.currentBatch++;
-                const progress = (currentData.processedKeys.size / currentData.totalEntries) * 100;
-                progressFill.style.width = `${Math.min(progress, 100)}%`;
 
-                // Enable save button if we have any translations
-                saveBtn.disabled = Object.keys(currentData.translations).length === 0;
+                // Update statistics
+                updateStatistics();
+
+                // Enable save button if we have translations
+                if (Object.keys(currentData.translations).length > 0) {
+                    document.getElementById('saveBtn').disabled = false;
+                }
 
                 showStatus('Batch completed successfully!', 'success');
             } catch (error) {
@@ -297,116 +568,74 @@ Target language: ${targetLang}`
             }
         }
 
-        nextBtn.addEventListener('click', processBatch);
-
-        saveBtn.addEventListener('click', () => {
-            const data = {
-                [currentData.targetLang]: currentData.translations
-            };
-            
-            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `translations_${currentData.targetLang}_${new Date().toISOString()}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
-
+        // Add updateTable function
         function updateTable(entries, results) {
-            // Create new rows for current batch
-            const newRows = entries.map(([key, englishText]) => `
-                <tr>
-                    <td>${key}</td>
-                    <td>${englishText}</td>
-                    <td>${currentData.originalTranslations[key] || ''}</td>
-                    <td>${results[key] || ''}</td>
-                </tr>
-            `).join('');
+            const table = document.getElementById('translationTable');
             
-            // Prepend new rows to existing content
-            if (translationTable.innerHTML) {
-                translationTable.innerHTML = newRows + translationTable.innerHTML;
-            } else {
-                translationTable.innerHTML = newRows;
-            }
-        }
-
-        function showStatus(message, type) {
-            statusDiv.textContent = message;
-            statusDiv.className = `status ${type}`;
-        }
-
-        // Update the table headers dynamically
-        function updateTableHeaders() {
-            const headerRow = document.querySelector('table thead tr');
-            const sourceLangName = document.getElementById('sourceLang').options[document.getElementById('sourceLang').selectedIndex].text;
-            headerRow.innerHTML = `
-                <th>Asset ID</th>
-                <th>${sourceLangName}</th>
-                <th>Original Translation</th>
-                <th>New Translation</th>
-            `;
-        }
-
-        // Call updateTableHeaders when source language changes
-        document.getElementById('sourceLang').addEventListener('change', updateTableHeaders);
-
-        // Update table headers when starting
-        updateTableHeaders();
-
-        // Load saved preferences from localStorage
-        function loadSavedPreferences() {
-            try {
-                const savedPreferences = JSON.parse(localStorage.getItem('translationPreferences')) || {};
+            entries.forEach(([key, sourceText]) => {
+                // Check if row already exists
+                let row = document.querySelector(`tr[data-key="${key}"]`);
                 
-                // Set source language from localStorage or default to English
-                const sourceLangSelect = document.getElementById('sourceLang');
-                sourceLangSelect.value = savedPreferences.sourceLang || 'en';
-                
-                // Set target language from localStorage if it exists
-                const targetLangSelect = document.getElementById('targetLang');
-                if (savedPreferences.targetLang) {
-                    targetLangSelect.value = savedPreferences.targetLang;
+                if (!row) {
+                    // Create new row if it doesn't exist
+                    row = document.createElement('tr');
+                    row.setAttribute('data-key', key);
+                    table.appendChild(row);
                 }
                 
-                // Set batch size from localStorage or default to 10
-                const batchSizeInput = document.getElementById('batchSize');
-                batchSizeInput.value = savedPreferences.batchSize || 10;
+                // Update row content
+                row.innerHTML = `
+                    <td>${key}</td>
+                    <td>${sourceText}</td>
+                    <td>${currentData.originalTranslations[key] || ''}</td>
+                    <td>${results[key] || ''}</td>
+                `;
+            });
+        }
+
+        // Add statistics update function
+        function updateStatistics() {
+            const totalEntries = Object.keys(currentData.englishSource || {}).length;
+            const translatedEntries = currentData.processedKeys.size;
+            const progressPercentage = totalEntries ? Math.round((translatedEntries / totalEntries) * 100) : 0;
+
+            document.getElementById('totalEntries').textContent = totalEntries;
+            document.getElementById('translatedEntries').textContent = translatedEntries;
+            document.getElementById('progressPercentage').textContent = `${progressPercentage}%`;
+            document.getElementById('progressFill').style.width = `${progressPercentage}%`;
+        }
+
+        // Add helper function to flatten nested objects
+        function flattenObject(obj, prefix = '') {
+            return Object.keys(obj).reduce((acc, key) => {
+                const pre = prefix.length ? prefix + '.' : '';
+                if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
+                    Object.assign(acc, flattenObject(obj[key], pre + key));
+                } else {
+                    acc[pre + key] = obj[key];
+                }
+                return acc;
+            }, {});
+        }
+
+        // Add helper function to unflatten object for export
+        function unflattenObject(obj) {
+            const result = {};
+            
+            for (const key in obj) {
+                const keys = key.split('.');
+                let current = result;
                 
-                // Update table headers with saved source language
-                updateTableHeaders();
-            } catch (error) {
-                console.error('Error loading preferences:', error);
-                // If there's an error, set defaults
-                document.getElementById('sourceLang').value = 'en';
-                document.getElementById('batchSize').value = 10;
+                for (let i = 0; i < keys.length - 1; i++) {
+                    current[keys[i]] = current[keys[i]] || {};
+                    current = current[keys[i]];
+                }
+                
+                current[keys[keys.length - 1]] = obj[key];
             }
+            
+            return result;
         }
-
-        // Function to save preferences
-        function savePreferences() {
-            const preferences = {
-                sourceLang: document.getElementById('sourceLang').value,
-                targetLang: document.getElementById('targetLang').value,
-                batchSize: document.getElementById('batchSize').value
-            };
-            localStorage.setItem('translationPreferences', JSON.stringify(preferences));
-        }
-
-        // Add event listeners to save preferences when changed
-        document.getElementById('sourceLang').addEventListener('change', () => {
-            updateTableHeaders();
-            savePreferences();
-        });
-
-        document.getElementById('targetLang').addEventListener('change', savePreferences);
-        document.getElementById('batchSize').addEventListener('change', savePreferences);
-
-        // Load preferences when page loads
-        document.addEventListener('DOMContentLoaded', loadSavedPreferences);
     </script>
 </body>
 </html> 

@@ -8,7 +8,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const app = express();
-app.use(cors());  // Enable CORS for all routes
+
+// Enable CORS and JSON parsing - these need to be before any routes
+app.use(cors());
+app.use(express.json());  // Make sure this is before the routes
+
+// Log all incoming requests
+app.use((req, res, next) => {
+    console.log(`${req.method} ${req.path}`, {
+        body: req.body,
+        query: req.query,
+        headers: req.headers
+    });
+    next();
+});
 
 // Set correct MIME types
 app.use(express.static(dirname(__dirname), {
@@ -51,6 +64,12 @@ app.get('/api/translations', async (req, res) => {
         console.error('Error:', error);
         res.status(500).json({ error: error.message });
     }
+});
+
+// Error handling middleware
+app.use((err, req, res, next) => {
+    console.error('Error:', err);
+    res.status(500).json({ error: err.message });
 });
 
 const PORT = 3000;
