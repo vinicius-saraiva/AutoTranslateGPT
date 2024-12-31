@@ -1,0 +1,5 @@
+node_modules/
+.env
+usage_logs/
+translations/
+data/
