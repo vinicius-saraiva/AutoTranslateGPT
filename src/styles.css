@@ -1,15 +1,20 @@
 body {
-    font-family: Arial, sans-serif;
+    font-family: 'Open Sans', sans-serif;
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    background-color: #f4f5f6;
+    color: #140309;
+    line-height: 1.5;
 }
 
 .setup-container {
     margin-bottom: 20px;
     padding: 20px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+    border: none;
+    border-radius: 8px;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .control-panel {
@@ -22,60 +27,89 @@ table {
     width: 100%;
     border-collapse: collapse;
     margin-top: 20px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    overflow: hidden;
 }
 
 th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
+    border: none;
+    border-bottom: 1px solid #E7E7E7;
+    padding: 12px 16px;
     text-align: left;
+    font-size: 14px;
 }
 
 th {
-    background-color: #f4f4f4;
+    background-color: #fafafa;
+    color: #666;
+    font-weight: 600;
 }
 
 button {
-    padding: 10px 20px;
+    padding: 8px 16px;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    background-color: #4CAF50;
+    background-color: #28AB84;
     color: white;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+button:hover:not(:disabled) {
+    opacity: 0.9;
 }
 
 button:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
+    opacity: 0.7;
 }
 
 select, input {
-    padding: 8px;
+    padding: 8px 12px;
     border-radius: 4px;
-    border: 1px solid #ddd;
+    border: 1px solid #E7E7E7;
+    font-family: 'Open Sans', sans-serif;
+    font-size: 14px;
+}
+
+select:hover:not(:disabled),
+input:hover:not(:disabled),
+select:focus,
+input:focus {
+    border-color: #28AB84;
+    outline: none;
 }
 
 .status {
     margin-top: 10px;
-    padding: 10px;
+    padding: 12px 16px;
     border-radius: 4px;
+    font-size: 14px;
 }
 
 .error {
-    background-color: #ffebee;
-    color: #c62828;
+    background-color: rgba(220, 53, 69, 0.1);
+    color: #DC3545;
 }
 
 .success {
-    background-color: #e8f5e9;
-    color: #2e7d32;
+    background-color: rgba(40, 171, 132, 0.1);
+    color: #28AB84;
 }
 
 /* Stats container styles */
 .stats-container {
     margin: 20px 0;
-    padding: 15px;
-    background-color: #f5f5f5;
-    border-radius: 5px;
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .stats-grid {
@@ -90,20 +124,19 @@ select, input {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 8px;
-    background-color: white;
+    padding: 12px;
+    background-color: #f8f9fa;
     border-radius: 4px;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .stat-item label {
-    font-weight: bold;
+    font-weight: 500;
     color: #666;
 }
 
 .stat-item span {
     color: #333;
-    font-family: monospace;
+    font-family: 'Open Sans', monospace;
 }
 
 .progress-container {
@@ -122,7 +155,7 @@ select, input {
 .progress-fill {
     width: 0%;
     height: 100%;
-    background-color: #4CAF50;
+    background-color: #28AB84;
     transition: width 0.3s ease;
 }
 
@@ -132,7 +165,7 @@ select, input {
     top: 50%;
     transform: translate(-50%, -50%);
     color: white;
-    font-weight: bold;
+    font-weight: 500;
     text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
     z-index: 1;
 }
@@ -149,14 +182,13 @@ select, input {
     align-items: center;
     gap: 8px;
     padding: 8px 16px;
-    border: 2px solid #ddd;
+    border: 2px solid #E7E7E7;
     border-radius: 4px;
-    background-color: #f8f9fa;
+    background-color: white;
     color: #333;
     cursor: pointer;
     transition: all 0.2s ease;
     font-weight: 500;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
 }
 
 .lang-button img {
@@ -165,19 +197,18 @@ select, input {
 }
 
 .lang-button[data-selected="true"] {
-    background-color: #2196F3;
-    border-color: #1976D2;
+    background-color: #28AB84;
+    border-color: #28AB84;
     color: white;
-    box-shadow: 0 2px 4px rgba(33,150,243,0.3);
 }
 
 .lang-button:hover {
-    border-color: #2196F3;
-    background-color: #e3f2fd;
-    color: #1976D2;
+    border-color: #28AB84;
+    background-color: rgba(40, 171, 132, 0.1);
+    color: #28AB84;
 }
 
 .lang-button[data-selected="true"]:hover {
-    background-color: #1976D2;
+    background-color: #239873;
     color: white;
 } 
