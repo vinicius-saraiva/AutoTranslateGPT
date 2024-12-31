@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Translation Manager</title>
+    <!-- Import as ES module -->
+    <script type="module">
+        import OpenAI from 'https://cdn.jsdelivr.net/npm/openai@4.28.0/+esm'
+        window.OpenAI = OpenAI;
+    </script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <h1>Translation Manager</h1>
+
+    <div class="setup-container">
+        <h2>Setup</h2>
+        <div>
+            <label for="locoApiKey">Localise API Key:</label>
+            <input type="password" id="locoApiKey" placeholder="Enter your Localise API key">
+        </div>
+        <div>
+            <label for="openaiApiKey">OpenAI API Key:</label>
+            <input type="password" id="openaiApiKey" placeholder="Enter your OpenAI API key">
+        </div>
+        <div>
+            <label for="sourceLang">Source Language:</label>
+            <select id="sourceLang">
+                <option value="en-GB">English</option>
+                <option value="fr-FR">French</option>
+                <option value="es-ES">Spanish</option>
+                <option value="de-DE">German</option>
+                <option value="it-IT">Italian</option>
+                <option value="nl-NL">Dutch</option>
+                <option value="bg-BG">Bulgarian</option>
+                <option value="hu-HU">Hungarian</option>
+                <option value="ro-RO">Romanian</option>
+                <option value="cs-CZ">Czech</option>
+                <option value="zh-CN">Chinese</option>
+                <option value="el-GR">Greek</option>
+            </select>
+        </div>
+        <div>
+            <label for="targetLang">Target Language:</label>
+            <select id="targetLang">
+                <option value="">Select language...</option>
+                <option value="en-GB">English</option>
+                <option value="fr-FR">French</option>
+                <option value="es-ES">Spanish</option>
+                <option value="de-DE">German</option>
+                <option value="it-IT">Italian</option>
+                <option value="nl-NL">Dutch</option>
+                <option value="bg-BG">Bulgarian</option>
+                <option value="hu-HU">Hungarian</option>
+                <option value="ro-RO">Romanian</option>
+                <option value="cs-CZ">Czech</option>
+                <option value="zh-CN">Chinese</option>
+                <option value="el-GR">Greek</option>
+            </select>
+        </div>
+        <div>
+            <label for="batchSize">Batch Size:</label>
+            <input type="number" id="batchSize" value="10" min="1" max="50">
+        </div>
+    </div>
+
+    <div class="control-panel">
+        <button id="startBtn">Start Translation</button>
+        <button id="nextBtn" disabled>Next Batch</button>
+        <button id="saveBtn" disabled>Save Translations</button>
+    </div>
+
+    <div class="progress-bar">
+        <div class="progress-fill"></div>
+    </div>
+
+    <div class="status" id="status"></div>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Asset ID</th>
+                <th>English</th>
+                <th>Original Translation</th>
+                <th>New Translation</th>
+            </tr>
+        </thead>
+        <tbody id="translationTable">
+            <!-- Translations will be inserted here -->
+        </tbody>
+    </table>
+
+    <script>
+        let openaiClient = null;
+        let currentData = {
+            englishSource: {},
+            originalTranslations: {},
+            translations: {},
+            totalEntries: 0,
+            currentBatch: 0,
+            batchSize: 10,
+            targetLang: '',
+            sourceLang: 'en',  // Default to English
+            processedKeys: new Set()
+        };
+
+        // Initialize UI elements
+        const startBtn = document.getElementById('startBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const saveBtn = document.getElementById('saveBtn');
+        const statusDiv = document.getElementById('status');
+        const progressFill = document.querySelector('.progress-fill');
+        const translationTable = document.getElementById('translationTable');
+
+        // Load saved API keys on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const savedLocoKey = localStorage.getItem('locoApiKey');
+            const savedOpenAIKey = localStorage.getItem('openaiApiKey');
+            
+            if (savedLocoKey) {
+                document.getElementById('locoApiKey').value = savedLocoKey;
+            }
+            if (savedOpenAIKey) {
+                document.getElementById('openaiApiKey').value = savedOpenAIKey;
+            }
+        });
+
+        startBtn.addEventListener('click', async () => {
+            try {
+                const locoApiKey = document.getElementById('locoApiKey').value;
+                const openaiApiKey = document.getElementById('openaiApiKey').value;
+                const targetLang = document.getElementById('targetLang').value;
+                const sourceLang = document.getElementById('sourceLang').value;
+                const batchSize = parseInt(document.getElementById('batchSize').value);
+
+                if (!locoApiKey || !openaiApiKey || !targetLang || !sourceLang) {
+                    showStatus('Please fill in all required fields', 'error');
+                    return;
+                }
+
+                showStatus('Downloading translations...', 'success');
+                
+                const response = await fetch(`http://localhost:3000/api/translations?key=${encodeURIComponent(locoApiKey)}`);
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                console.log('Received data:', data);
+
+                // Initialize OpenAI client
+                openaiClient = new window.OpenAI({
+                    apiKey: openaiApiKey,
+                    dangerouslyAllowBrowser: true
+                });
+
+                // Reset everything for new session with the correct source data
+                currentData = {
+                    englishSource: data[sourceLang] || {},  // Use selected source language
+                    originalTranslations: data[targetLang] || {},
+                    translations: {},
+                    totalEntries: Object.keys(data[sourceLang] || {}).length,
+                    currentBatch: 0,
+                    batchSize: batchSize,
+                    targetLang: targetLang,
+                    sourceLang: sourceLang,
+                    processedKeys: new Set()
+                };
+
+                console.log('Initialized currentData:', {
+                    sourceEntriesCount: Object.keys(currentData.englishSource).length,
+                    targetEntriesCount: Object.keys(currentData.originalTranslations).length,
+                    sourceLang,
+                    targetLang
+                });
+
+                // Enable next batch button if we have entries to process
+                nextBtn.disabled = currentData.totalEntries === 0;
+                startBtn.disabled = true;
+                
+                showStatus('Ready to start translations. Click "Next Batch" to begin.', 'success');
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('Error: ' + error.message, 'error');
+                startBtn.disabled = false;
+            }
+        });
+
+        async function translateText(text, targetLang) {
+            if (!text || text.trim() === '') return '';
+
+            try {
+                const completion = await openaiClient.chat.completions.create({
+                    messages: [
+                        {
+                            role: "system",
+                            content: `You are a professional translator for a B2B foreign exchange and cross-border payments platform. 
+                            
+Important rules:
+- Translate content for medium-sized businesses in a professional tone
+- Preserve ALL variables without translation, including:
+  * %variable%
+  * %%variable%%
+  * {{variable}}
+  * \${variable}  
+- DO NOT translate:
+  * HTML tags
+  * URLs
+  
+Context: The platform handles currency conversion, international payments, and financial operations for business clients.
+
+Target language: ${targetLang}`
+                        },
+                        {
+                            role: "user",
+                            content: text
+                        }
+                    ],
+                    model: "gpt-4",
+                    temperature: 0.7
+                });
+
+                console.log('Translation request ID:', completion.id);
+                return completion.choices[0].message.content.trim();
+            } catch (error) {
+                console.error('OpenAI API Error:', error);
+                if (error.response) {
+                    console.error('Response:', error.response.data);
+                }
+                throw new Error(`Translation error: ${error.message}`);
+            }
+        }
+
+        async function processBatch() {
+            console.log('Current Data:', {
+                totalEntries: currentData.totalEntries,
+                processedKeys: Array.from(currentData.processedKeys),
+                sourceDataSize: Object.keys(currentData.englishSource).length,
+                currentBatch: currentData.currentBatch
+            });
+
+            const allEntries = Object.entries(currentData.englishSource);
+            const unprocessedEntries = allEntries
+                .filter(([key]) => !currentData.processedKeys.has(key));
+            
+            console.log('Entries:', {
+                allEntriesCount: allEntries.length,
+                unprocessedCount: unprocessedEntries.length
+            });
+
+            const entries = unprocessedEntries.slice(0, currentData.batchSize);
+
+            if (entries.length === 0) {
+                showStatus('All translations completed!', 'success');
+                nextBtn.disabled = true;
+                return;
+            }
+
+            try {
+                showStatus('Translating batch...', 'success');
+                const results = {};
+                
+                for (const [key, sourceText] of entries) {
+                    try {
+                        if (typeof sourceText === 'object') {
+                            console.warn(`Skipping key ${key} - invalid source text:`, sourceText);
+                            continue;
+                        }
+                        
+                        results[key] = await translateText(sourceText, currentData.targetLang);
+                        currentData.processedKeys.add(key);  // Mark as processed
+                        // Update table after each successful translation
+                        updateTable([[key, sourceText]], { [key]: results[key] });
+                    } catch (error) {
+                        console.error(`Error translating key ${key}:`, error);
+                        results[key] = `ERROR: ${error.message}`;
+                        currentData.processedKeys.add(key);  // Mark as processed even if it failed
+                    }
+                }
+                
+                // Update translations
+                Object.assign(currentData.translations, results);
+                
+                // Update progress
+                currentData.currentBatch++;
+                const progress = (currentData.processedKeys.size / currentData.totalEntries) * 100;
+                progressFill.style.width = `${Math.min(progress, 100)}%`;
+
+                // Enable save button if we have any translations
+                saveBtn.disabled = Object.keys(currentData.translations).length === 0;
+
+                showStatus('Batch completed successfully!', 'success');
+            } catch (error) {
+                console.error('Batch processing error:', error);
+                showStatus('Error processing batch: ' + error.message, 'error');
+            }
+        }
+
+        nextBtn.addEventListener('click', processBatch);
+
+        saveBtn.addEventListener('click', () => {
+            const data = {
+                [currentData.targetLang]: currentData.translations
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `translations_${currentData.targetLang}_${new Date().toISOString()}.json`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        function updateTable(entries, results) {
+            // Create new rows for current batch
+            const newRows = entries.map(([key, englishText]) => `
+                <tr>
+                    <td>${key}</td>
+                    <td>${englishText}</td>
+                    <td>${currentData.originalTranslations[key] || ''}</td>
+                    <td>${results[key] || ''}</td>
+                </tr>
+            `).join('');
+            
+            // Prepend new rows to existing content
+            if (translationTable.innerHTML) {
+                translationTable.innerHTML = newRows + translationTable.innerHTML;
+            } else {
+                translationTable.innerHTML = newRows;
+            }
+        }
+
+        function showStatus(message, type) {
+            statusDiv.textContent = message;
+            statusDiv.className = `status ${type}`;
+        }
+
+        // Update the table headers dynamically
+        function updateTableHeaders() {
+            const headerRow = document.querySelector('table thead tr');
+            const sourceLangName = document.getElementById('sourceLang').options[document.getElementById('sourceLang').selectedIndex].text;
+            headerRow.innerHTML = `
+                <th>Asset ID</th>
+                <th>${sourceLangName}</th>
+                <th>Original Translation</th>
+                <th>New Translation</th>
+            `;
+        }
+
+        // Call updateTableHeaders when source language changes
+        document.getElementById('sourceLang').addEventListener('change', updateTableHeaders);
+
+        // Update table headers when starting
+        updateTableHeaders();
+
+        // Load saved preferences from localStorage
+        function loadSavedPreferences() {
+            try {
+                const savedPreferences = JSON.parse(localStorage.getItem('translationPreferences')) || {};
+                
+                // Set source language from localStorage or default to English
+                const sourceLangSelect = document.getElementById('sourceLang');
+                sourceLangSelect.value = savedPreferences.sourceLang || 'en';
+                
+                // Set target language from localStorage if it exists
+                const targetLangSelect = document.getElementById('targetLang');
+                if (savedPreferences.targetLang) {
+                    targetLangSelect.value = savedPreferences.targetLang;
+                }
+                
+                // Set batch size from localStorage or default to 10
+                const batchSizeInput = document.getElementById('batchSize');
+                batchSizeInput.value = savedPreferences.batchSize || 10;
+                
+                // Update table headers with saved source language
+                updateTableHeaders();
+            } catch (error) {
+                console.error('Error loading preferences:', error);
+                // If there's an error, set defaults
+                document.getElementById('sourceLang').value = 'en';
+                document.getElementById('batchSize').value = 10;
+            }
+        }
+
+        // Function to save preferences
+        function savePreferences() {
+            const preferences = {
+                sourceLang: document.getElementById('sourceLang').value,
+                targetLang: document.getElementById('targetLang').value,
+                batchSize: document.getElementById('batchSize').value
+            };
+            localStorage.setItem('translationPreferences', JSON.stringify(preferences));
+        }
+
+        // Add event listeners to save preferences when changed
+        document.getElementById('sourceLang').addEventListener('change', () => {
+            updateTableHeaders();
+            savePreferences();
+        });
+
+        document.getElementById('targetLang').addEventListener('change', savePreferences);
+        document.getElementById('batchSize').addEventListener('change', savePreferences);
+
+        // Load preferences when page loads
+        document.addEventListener('DOMContentLoaded', loadSavedPreferences);
+    </script>
+</body>
+</html> 
