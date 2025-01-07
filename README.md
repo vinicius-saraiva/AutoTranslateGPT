@@ -1,0 +1,1 @@
+To launch the app, run `node src/server.js`

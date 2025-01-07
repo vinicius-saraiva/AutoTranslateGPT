@@ -10,162 +10,186 @@
         window.OpenAI = OpenAI;
     </script>
     <link rel="stylesheet" href="styles.css">
+    <script type="module">
+        // Import franc
+        import { franc } from 'https://esm.sh/franc@6?bundle';
+        
+        // Make franc available globally since our other code needs it
+        window.franc = franc;
+    </script>
 </head>
 <body>
-    <h1>Translation Manager</h1>
-
-    <div class="setup-container">
-        <h2>Setup</h2>
-        <div>
-            <label for="locoApiKey">Localise API Key:</label>
-            <input type="password" id="locoApiKey" placeholder="Enter your Localise API key">
-        </div>
-        <div>
-            <label for="openaiApiKey">OpenAI API Key:</label>
-            <input type="password" id="openaiApiKey" placeholder="Enter your OpenAI API key">
-        </div>
-        <div>
-            <label>Source Language:</label>
-            <div class="language-grid" id="sourceLangGrid">
-                <!-- Germanic languages -->
-                <button type="button" class="lang-button" data-lang="en-GB" data-selected="true">
-                    <img src="https://flagcdn.com/w20/gb.png" alt="English">
-                    English
-                </button>
-                <button type="button" class="lang-button" data-lang="de-DE">
-                    <img src="https://flagcdn.com/w20/de.png" alt="German">
-                    German
-                </button>
-                <button type="button" class="lang-button" data-lang="nl-NL">
-                    <img src="https://flagcdn.com/w20/nl.png" alt="Dutch">
-                    Dutch
-                </button>
-
-                <!-- Romance languages -->
-                <button type="button" class="lang-button" data-lang="fr-FR">
-                    <img src="https://flagcdn.com/w20/fr.png" alt="French">
-                    French
-                </button>
-                <button type="button" class="lang-button" data-lang="es-ES">
-                    <img src="https://flagcdn.com/w20/es.png" alt="Spanish">
-                    Spanish
-                </button>
-                <button type="button" class="lang-button" data-lang="it-IT">
-                    <img src="https://flagcdn.com/w20/it.png" alt="Italian">
-                    Italian
-                </button>
-                <button type="button" class="lang-button" data-lang="ro-RO">
-                    <img src="https://flagcdn.com/w20/ro.png" alt="Romanian">
-                    Romanian
-                </button>
-
-                <!-- Slavic languages -->
-                <button type="button" class="lang-button" data-lang="cs-CZ">
-                    <img src="https://flagcdn.com/w20/cz.png" alt="Czech">
-                    Czech
-                </button>
-                <button type="button" class="lang-button" data-lang="bg-BG">
-                    <img src="https://flagcdn.com/w20/bg.png" alt="Bulgarian">
-                    Bulgarian
-                </button>
-
-                <!-- Other Indo-European -->
-                <button type="button" class="lang-button" data-lang="el-GR">
-                    <img src="https://flagcdn.com/w20/gr.png" alt="Greek">
-                    Greek
-                </button>
-
-                <!-- Uralic languages -->
-                <button type="button" class="lang-button" data-lang="hu-HU">
-                    <img src="https://flagcdn.com/w20/hu.png" alt="Hungarian">
-                    Hungarian
-                </button>
-
-                <!-- East Asian languages -->
-                <button type="button" class="lang-button" data-lang="zh-CN">
-                    <img src="https://flagcdn.com/w20/cn.png" alt="Chinese">
-                    Chinese
+    <div class="header">
+        <div class="header-content">
+            <div class="logo">
+                <img src="https://platform.ibanfirst.com/upload/Cobrands/ibanfirst/favicon.png" alt="Logo" class="logo-img">
+                <span class="logo-text">Translation Service</span>
+            </div>
+            <div class="header-controls">
+                <div class="api-input-group">
+                    <label for="locoApiKey">Localise API Key:</label>
+                    <input type="password" id="locoApiKey" placeholder="Enter your Localise API key">
+                    <button id="loadProjectBtn" class="primary-btn">Load Project</button>
+                </div>
+                <button id="configureBtn" class="configure-btn">
+                    <span class="vega-icon-settings"></span>
+                    OpenAI API Key
                 </button>
             </div>
-        </div>
-        <div>
-            <label>Target Language:</label>
-            <div class="language-grid" id="targetLangGrid">
-                <!-- Germanic languages -->
-                <button type="button" class="lang-button" data-lang="en-GB">
-                    <img src="https://flagcdn.com/w20/gb.png" alt="English">
-                    English
-                </button>
-                <button type="button" class="lang-button" data-lang="de-DE">
-                    <img src="https://flagcdn.com/w20/de.png" alt="German">
-                    German
-                </button>
-                <button type="button" class="lang-button" data-lang="nl-NL">
-                    <img src="https://flagcdn.com/w20/nl.png" alt="Dutch">
-                    Dutch
-                </button>
-
-                <!-- Romance languages -->
-                <button type="button" class="lang-button" data-lang="fr-FR">
-                    <img src="https://flagcdn.com/w20/fr.png" alt="French">
-                    French
-                </button>
-                <button type="button" class="lang-button" data-lang="es-ES">
-                    <img src="https://flagcdn.com/w20/es.png" alt="Spanish">
-                    Spanish
-                </button>
-                <button type="button" class="lang-button" data-lang="it-IT">
-                    <img src="https://flagcdn.com/w20/it.png" alt="Italian">
-                    Italian
-                </button>
-                <button type="button" class="lang-button" data-lang="ro-RO">
-                    <img src="https://flagcdn.com/w20/ro.png" alt="Romanian">
-                    Romanian
-                </button>
-
-                <!-- Slavic languages -->
-                <button type="button" class="lang-button" data-lang="cs-CZ">
-                    <img src="https://flagcdn.com/w20/cz.png" alt="Czech">
-                    Czech
-                </button>
-                <button type="button" class="lang-button" data-lang="bg-BG">
-                    <img src="https://flagcdn.com/w20/bg.png" alt="Bulgarian">
-                    Bulgarian
-                </button>
-
-                <!-- Other Indo-European -->
-                <button type="button" class="lang-button" data-lang="el-GR">
-                    <img src="https://flagcdn.com/w20/gr.png" alt="Greek">
-                    Greek
-                </button>
-
-                <!-- Uralic languages -->
-                <button type="button" class="lang-button" data-lang="hu-HU">
-                    <img src="https://flagcdn.com/w20/hu.png" alt="Hungarian">
-                    Hungarian
-                </button>
-
-                <!-- East Asian languages -->
-                <button type="button" class="lang-button" data-lang="zh-CN">
-                    <img src="https://flagcdn.com/w20/cn.png" alt="Chinese">
-                    Chinese
-                </button>
-            </div>
-        </div>
-        <div>
-            <label for="batchSize">Batch Size:</label>
-            <input type="number" id="batchSize" value="10" min="1" max="50">
-        </div>
-        <div>
-            <label>
-                <input type="checkbox" id="ignoreBlank" checked>
-                Ignore blank source entries
-            </label>
         </div>
     </div>
 
+    <div id="status" class="status-message"></div>
+
+    <style>
+        .status-message {
+            margin: 16px auto;
+            padding: 12px 24px;
+            border-radius: 8px;
+            max-width: 1200px;
+            display: none;
+        }
+
+        .status-message.info {
+            background-color: #e3f2fd;
+            color: #1976d2;
+            display: block;
+        }
+
+        .status-message.success {
+            background-color: #e8f5e9;
+            color: #2e7d32;
+            display: block;
+        }
+
+        .status-message.error {
+            background-color: #ffebee;
+            color: #c62828;
+            display: block;
+        }
+    </style>
+
+    <div class="setup-container">
+        <div class="setup-grid">
+            <div class="setup-column">
+                <div>
+                    <label>Source Language:</label>
+                    <div class="language-grid" id="sourceLangGrid">
+                        <!-- Germanic languages -->
+                        <button type="button" class="lang-button" data-lang="en-GB" data-selected="true" title="English">
+                            <img src="https://flagcdn.com/w20/gb.png" alt="English">
+                        </button>
+                        <button type="button" class="lang-button" data-lang="de-DE" title="German">
+                            <img src="https://flagcdn.com/w20/de.png" alt="German">
+                        </button>
+                        <button type="button" class="lang-button" data-lang="nl-NL" title="Dutch">
+                            <img src="https://flagcdn.com/w20/nl.png" alt="Dutch">
+                        </button>
+
+                        <!-- Romance languages -->
+                        <button type="button" class="lang-button" data-lang="fr-FR" title="French">
+                            <img src="https://flagcdn.com/w20/fr.png" alt="French">
+                        </button>
+                        <button type="button" class="lang-button" data-lang="es-ES" title="Spanish">
+                            <img src="https://flagcdn.com/w20/es.png" alt="Spanish">
+                        </button>
+                        <button type="button" class="lang-button" data-lang="it-IT" title="Italian">
+                            <img src="https://flagcdn.com/w20/it.png" alt="Italian">
+                        </button>
+                        <button type="button" class="lang-button" data-lang="ro-RO" title="Romanian">
+                            <img src="https://flagcdn.com/w20/ro.png" alt="Romanian">
+                        </button>
+
+                        <!-- Slavic languages -->
+                        <button type="button" class="lang-button" data-lang="cs-CZ" title="Czech">
+                            <img src="https://flagcdn.com/w20/cz.png" alt="Czech">
+                        </button>
+                        <button type="button" class="lang-button" data-lang="bg-BG" title="Bulgarian">
+                            <img src="https://flagcdn.com/w20/bg.png" alt="Bulgarian">
+                        </button>
+
+                        <!-- Other Indo-European -->
+                        <button type="button" class="lang-button" data-lang="el-GR" title="Greek">
+                            <img src="https://flagcdn.com/w20/gr.png" alt="Greek">
+                        </button>
+
+                        <!-- Uralic languages -->
+                        <button type="button" class="lang-button" data-lang="hu-HU" title="Hungarian">
+                            <img src="https://flagcdn.com/w20/hu.png" alt="Hungarian">
+                        </button>
+
+                        <!-- East Asian languages -->
+                        <button type="button" class="lang-button" data-lang="zh-CN" title="Chinese">
+                            <img src="https://flagcdn.com/w20/cn.png" alt="Chinese">
+                        </button>
+                    </div>
+                </div>
+                <div class="checkbox-group">
+                    <label>
+                        <input type="checkbox" id="ignoreBlank" checked>
+                        Ignore blank source entries
+                    </label>
+                </div>
+            </div>
+            <div class="setup-column">
+                <div>
+                    <label>Target Language:</label>
+                    <div class="language-grid" id="targetLangGrid">
+                        <!-- Germanic languages -->
+                        <button type="button" class="lang-button" data-lang="en-GB" title="English">
+                            <img src="https://flagcdn.com/w20/gb.png" alt="English">
+                        </button>
+                        <button type="button" class="lang-button" data-lang="de-DE" title="German">
+                            <img src="https://flagcdn.com/w20/de.png" alt="German">
+                        </button>
+                        <button type="button" class="lang-button" data-lang="nl-NL" title="Dutch">
+                            <img src="https://flagcdn.com/w20/nl.png" alt="Dutch">
+                        </button>
+
+                        <!-- Romance languages -->
+                        <button type="button" class="lang-button" data-lang="fr-FR" title="French">
+                            <img src="https://flagcdn.com/w20/fr.png" alt="French">
+                        </button>
+                        <button type="button" class="lang-button" data-lang="es-ES" title="Spanish">
+                            <img src="https://flagcdn.com/w20/es.png" alt="Spanish">
+                        </button>
+                        <button type="button" class="lang-button" data-lang="it-IT" title="Italian">
+                            <img src="https://flagcdn.com/w20/it.png" alt="Italian">
+                        </button>
+                        <button type="button" class="lang-button" data-lang="ro-RO" title="Romanian">
+                            <img src="https://flagcdn.com/w20/ro.png" alt="Romanian">
+                        </button>
+
+                        <!-- Slavic languages -->
+                        <button type="button" class="lang-button" data-lang="cs-CZ" title="Czech">
+                            <img src="https://flagcdn.com/w20/cz.png" alt="Czech">
+                        </button>
+                        <button type="button" class="lang-button" data-lang="bg-BG" title="Bulgarian">
+                            <img src="https://flagcdn.com/w20/bg.png" alt="Bulgarian">
+                        </button>
+
+                        <!-- Other Indo-European -->
+                        <button type="button" class="lang-button" data-lang="el-GR" title="Greek">
+                            <img src="https://flagcdn.com/w20/gr.png" alt="Greek">
+                        </button>
+
+                        <!-- Uralic languages -->
+                        <button type="button" class="lang-button" data-lang="hu-HU" title="Hungarian">
+                            <img src="https://flagcdn.com/w20/hu.png" alt="Hungarian">
+                        </button>
+
+                        <!-- East Asian languages -->
+                        <button type="button" class="lang-button" data-lang="zh-CN" title="Chinese">
+                            <img src="https://flagcdn.com/w20/cn.png" alt="Chinese">
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
     <div class="stats-container">
-        <h3>Statistics</h3>
         <div class="stats-grid">
             <div class="stat-item">
                 <label>Total Entries:</label>
@@ -186,16 +210,14 @@
     </div>
 
     <div class="control-panel">
+        <div class="batch-size-container">
+            <label for="batchSize">Batch Size:</label>
+            <input type="number" id="batchSize" value="10" min="1" max="50">
+        </div>
         <button id="startBtn">Start Translation</button>
         <button id="nextBtn" disabled>Next Batch</button>
         <button id="saveBtn" disabled>Save Translations</button>
     </div>
-
-    <div class="progress-bar">
-        <div class="progress-fill"></div>
-    </div>
-
-    <div class="status" id="status"></div>
 
     <table>
         <thead>
@@ -210,6 +232,24 @@
             <!-- Translations will be inserted here -->
         </tbody>
     </table>
+
+    <div id="apiModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>OpenAI API Configuration</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group">
+                    <label for="openaiApiKey">OpenAI API Key</label>
+                    <input type="password" id="openaiApiKey" placeholder="Enter your OpenAI API key">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="saveApiKeys" class="save-btn">Save Configuration</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // Initialize all global variables
@@ -234,10 +274,8 @@
                 targetLang: getSelectedLanguage('targetLangGrid'),
                 batchSize: document.getElementById('batchSize').value,
                 ignoreBlank: document.getElementById('ignoreBlank').checked,
-                locoApiKey: document.getElementById('locoApiKey').value,
-                openaiApiKey: document.getElementById('openaiApiKey').value
+                locoApiKey: document.getElementById('locoApiKey').value
             };
-            console.log('Saving preferences:', { ...preferences, locoApiKey: '***', openaiApiKey: '***' });
             localStorage.setItem('translationPreferences', JSON.stringify(preferences));
         }
 
@@ -325,13 +363,14 @@
             startBtn.addEventListener('click', async () => {
                 try {
                     const locoApiKey = document.getElementById('locoApiKey').value;
-                    const openaiApiKey = document.getElementById('openaiApiKey').value;
+                    const openaiApiKey = localStorage.getItem('openaiApiKey');
                     const targetLang = getSelectedLanguage('targetLangGrid');
                     const sourceLang = getSelectedLanguage('sourceLangGrid');
                     const batchSize = parseInt(document.getElementById('batchSize').value);
                     const ignoreBlank = document.getElementById('ignoreBlank').checked;
+                    const ignoreTranslated = document.getElementById('ignoreTranslated').checked;
 
-                    // Save preferences before starting
+                    // Save preferences
                     savePreferences();
 
                     if (!locoApiKey || !openaiApiKey || !targetLang || !sourceLang) {
@@ -340,9 +379,9 @@
                     }
 
                     // Show loading status
-                    showStatus('Fetching translations from Localise...', 'info');
+                    showStatus('Analyzing translations...', 'info');
 
-                    // Use the proxy endpoint instead of direct Localise API call
+                    // Use the proxy endpoint
                     const response = await fetch(`/api/translations?key=${encodeURIComponent(locoApiKey)}`);
 
                     if (!response.ok) {
@@ -370,12 +409,30 @@
                         dangerouslyAllowBrowser: true
                     });
 
+                    // Get original translations
+                    const originalTranslations = flattenObject(data[targetLang] || {});
+
+                    // Filter out already translated entries if checkbox is checked
+                    let entriesToTranslate = { ...sourceData };
+                    let skippedCount = 0;
+
+                    if (ignoreTranslated) {
+                        entriesToTranslate = Object.fromEntries(
+                            Object.entries(sourceData).filter(([key, sourceText]) => {
+                                const existingTranslation = originalTranslations[key];
+                                const shouldTranslate = shouldTranslateEntry(sourceText, existingTranslation, targetLang);
+                                if (!shouldTranslate) skippedCount++;
+                                return shouldTranslate;
+                            })
+                        );
+                    }
+
                     // Reset everything for new session
                     currentData = {
-                        englishSource: sourceData,
-                        originalTranslations: flattenObject(data[targetLang] || {}),
+                        englishSource: entriesToTranslate,
+                        originalTranslations: originalTranslations,
                         translations: {},
-                        totalEntries: Object.keys(sourceData).length,
+                        totalEntries: Object.keys(entriesToTranslate).length,
                         currentBatch: 0,
                         batchSize: batchSize,
                         targetLang: targetLang,
@@ -388,8 +445,8 @@
                     const nextBtn = document.getElementById('nextBtn');
                     const saveBtn = document.getElementById('saveBtn');
                     nextBtn.disabled = currentData.totalEntries === 0;
-                    saveBtn.disabled = true;
-
+                    saveBtn.disabled = false; // Allow saving at any time
+                    
                     // Clear existing table
                     const translationTable = document.getElementById('translationTable');
                     translationTable.innerHTML = '';
@@ -400,7 +457,9 @@
                     // Update statistics
                     updateStatistics();
 
-                    showStatus(`Loaded ${currentData.totalEntries} entries. Click "Next Batch" to begin translation.`, 'success');
+                    const skippedMessage = skippedCount > 0 ? 
+                        ` (${skippedCount} entries skipped as already translated)` : '';
+                    showStatus(`Loaded ${currentData.totalEntries} entries to translate${skippedMessage}. Click "Next Batch" to begin translation.`, 'success');
 
                 } catch (error) {
                     console.error('Error:', error);
@@ -452,6 +511,115 @@
                     showStatus('Error preparing download: ' + error.message, 'error');
                 }
             });
+
+            const modal = document.getElementById('apiModal');
+            const configureBtn = document.getElementById('configureBtn');
+            const closeBtn = document.querySelector('.close-modal');
+            const saveApiKeysBtn = document.getElementById('saveApiKeys');
+
+            // Add this function to handle API key display
+            function formatApiKeyDisplay(apiKey) {
+                if (!apiKey) return '';
+                if (apiKey.length < 7) return apiKey; // If key is too short, show as is
+                return `${apiKey.slice(0, 3)}...${apiKey.slice(-4)}`;
+            }
+
+            // Update the modal open handler to show masked key
+            configureBtn.addEventListener('click', () => {
+                modal.style.display = 'block';
+                // Load saved OpenAI key if exists
+                const openaiKey = localStorage.getItem('openaiApiKey');
+                const openaiInput = document.getElementById('openaiApiKey');
+                
+                if (openaiKey) {
+                    openaiInput.value = openaiKey;
+                    openaiInput.setAttribute('data-full-key', openaiKey);
+                    openaiInput.value = formatApiKeyDisplay(openaiKey);
+                }
+            });
+
+            // Add input handler to manage key display/edit
+            document.getElementById('openaiApiKey').addEventListener('focus', function() {
+                const fullKey = this.getAttribute('data-full-key');
+                if (fullKey) {
+                    this.value = fullKey;
+                }
+            });
+
+            document.getElementById('openaiApiKey').addEventListener('blur', function() {
+                if (this.value.length > 0) {
+                    this.setAttribute('data-full-key', this.value);
+                    this.value = formatApiKeyDisplay(this.value);
+                }
+            });
+
+            // Update save handler to use full key
+            saveApiKeysBtn.addEventListener('click', () => {
+                const openaiInput = document.getElementById('openaiApiKey');
+                const openaiKey = openaiInput.getAttribute('data-full-key') || openaiInput.value;
+                
+                localStorage.setItem('openaiApiKey', openaiKey);
+                modal.style.display = 'none';
+                
+                // Reinitialize OpenAI client with new key
+                openaiClient = new OpenAI({
+                    apiKey: openaiKey,
+                    dangerouslyAllowBrowser: true
+                });
+                
+                showStatus('OpenAI API key saved successfully', 'success');
+            });
+
+            closeBtn.addEventListener('click', () => {
+                modal.style.display = 'none';
+            });
+
+            window.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.style.display = 'none';
+                }
+            });
+
+            const loadProjectBtn = document.getElementById('loadProjectBtn');
+            loadProjectBtn.addEventListener('click', async () => {
+                try {
+                    const locoApiKey = document.getElementById('locoApiKey').value;
+
+                    if (!locoApiKey) {
+                        showStatus('Please enter your Localise API key', 'error');
+                        return;
+                    }
+
+                    // Show loading status
+                    showStatus('Loading project data...', 'info');
+
+                    // Use GET request with query parameter as defined in server.js
+                    const response = await fetch(`/api/translations?key=${encodeURIComponent(locoApiKey)}`);
+
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.status} ${response.statusText}`);
+                    }
+
+                    const data = await response.json();
+                    console.log('Received data:', data);
+
+                    // Update statistics
+                    const totalEntries = Object.keys(data['en-GB'] || {}).length;
+                    document.getElementById('totalEntries').textContent = totalEntries;
+                    document.getElementById('translatedEntries').textContent = '0';
+                    document.getElementById('progressPercentage').textContent = '0%';
+                    document.getElementById('progressFill').style.width = '0%';
+
+                    // Store the data for later use
+                    window.translationData = data;
+
+                    showStatus('Project loaded successfully!', 'success');
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    showStatus('Error loading project: ' + error.message, 'error');
+                }
+            });
         });
 
         function initLanguageButtons() {
@@ -493,8 +661,20 @@
         // Add status display function
         function showStatus(message, type = 'info') {
             const statusDiv = document.getElementById('status');
+            if (!statusDiv) {
+                console.error('Status element not found');
+                return;
+            }
+            
             statusDiv.textContent = message;
-            statusDiv.className = 'status ' + type;
+            statusDiv.className = 'status-message ' + type;
+            
+            // Optionally auto-hide success messages after 3 seconds
+            if (type === 'success') {
+                setTimeout(() => {
+                    statusDiv.style.display = 'none';
+                }, 3000);
+            }
         }
 
         // Add translateText function
@@ -504,7 +684,7 @@
                     messages: [
                         {
                             role: "system",
-                            content: `You are a professional translator. Translate the following text to ${targetLang}. Maintain any HTML tags, placeholders, or special characters. Only return the translation, nothing else.`
+                            content: `You are a translator for an FX web platform. Translate to ${targetLang}, keeping HTML tags, placeholders, and special characters intact. Respond with only the translation.`
                         },
                         {
                             role: "user",
@@ -521,47 +701,113 @@
             }
         }
 
-        // Update processBatch function
+        // Add this to your global variables
+        const SUPPORTED_LANGUAGES = {
+            'en-GB': 'eng',  // English
+            'de-DE': 'deu',  // German
+            'nl-NL': 'nld',  // Dutch
+            'fr-FR': 'fra',  // French
+            'es-ES': 'spa',  // Spanish
+            'it-IT': 'ita',  // Italian
+            'ro-RO': 'ron',  // Romanian
+            'cs-CZ': 'ces',  // Czech
+            'bg-BG': 'bul',  // Bulgarian
+            'el-GR': 'ell',  // Greek
+            'hu-HU': 'hun',  // Hungarian
+            'zh-CN': 'cmn'   // Chinese
+        };
+
+        // Add language detection function
+        function detectLanguage(text) {
+            // Wait for franc to be available
+            if (typeof window.franc === 'undefined') {
+                console.error('Franc not loaded yet');
+                return null;
+            }
+            
+            if (!text || text.trim().length < 10) return null;
+            
+            try {
+                const detectedLang = window.franc(text, {
+                    only: Object.values(SUPPORTED_LANGUAGES),
+                    minLength: 1
+                });
+                console.log('Detected language:', detectedLang);
+                
+                return Object.keys(SUPPORTED_LANGUAGES).find(
+                    locale => SUPPORTED_LANGUAGES[locale] === detectedLang
+                );
+            } catch (error) {
+                console.error('Language detection error:', error);
+                return null;
+            }
+        }
+
+        // Add checkbox to HTML right after target language selection
+        const targetLangSection = document.querySelector('#targetLangGrid').parentElement;
+        const ignoreTranslatedCheckbox = document.createElement('div');
+        ignoreTranslatedCheckbox.className = 'checkbox-group';
+        ignoreTranslatedCheckbox.innerHTML = `
+            <label>
+                <input type="checkbox" id="ignoreTranslated" checked>
+                Ignore entries already translated in target language
+            </label>
+        `;
+        targetLangSection.appendChild(ignoreTranslatedCheckbox);
+
+        // Update the translation process to skip already translated entries
+        function shouldTranslateEntry(sourceText, existingTranslation, targetLang) {
+            // If no existing translation, always translate
+            if (!existingTranslation) return true;
+            
+            // Detect language of existing translation
+            const detectedLang = detectLanguage(existingTranslation);
+            
+            // If we can't detect the language (too short/ambiguous) or 
+            // if detected language doesn't match target language, translate it
+            if (!detectedLang || detectedLang !== targetLang) return true;
+            
+            // If ignore translated is checked and text is in target language, skip it
+            return !document.getElementById('ignoreTranslated').checked;
+        }
+
+        // Update your translation process to use this check
+        // Add this check in your processBatch function before translating each entry
         async function processBatch() {
             try {
-                // Get next batch of unprocessed entries
                 const entries = Object.entries(currentData.englishSource)
                     .filter(([key]) => !currentData.processedKeys.has(key))
                     .slice(0, currentData.batchSize);
 
-                if (entries.length === 0) {
-                    showStatus('All entries processed!', 'success');
-                    document.getElementById('nextBtn').disabled = true;
-                    return;
-                }
-
-                showStatus('Processing batch...', 'info');
-
-                const results = {};
-                for (const [key, value] of entries) {
-                    try {
+                for (const [key, sourceText] of entries) {
+                    const existingTranslation = currentData.originalTranslations[key];
+                    
+                    if (shouldTranslateEntry(sourceText, existingTranslation, currentData.targetLang)) {
                         showStatus(`Translating entry ${currentData.processedKeys.size + 1}/${currentData.totalEntries}...`, 'info');
-                        results[key] = await translateText(value, currentData.targetLang);
-                        currentData.processedKeys.add(key);
-                        currentData.translations[key] = results[key];
-                        
-                        // Update table after each translation
-                        updateTable([[key, value]], { [key]: results[key] });
-                    } catch (error) {
-                        console.error('Error translating:', key, error);
-                        showStatus(`Error translating entry: ${error.message}`, 'error');
+                        currentData.translations[key] = await translateText(sourceText, currentData.targetLang);
+                    } else {
+                        currentData.translations[key] = existingTranslation;
+                        console.log(`Skipping translation for ${key} - already in target language`);
                     }
+                    
+                    currentData.processedKeys.add(key);
+                    updateTable([[key, sourceText]], { [key]: currentData.translations[key] });
                 }
-
-                // Update statistics
+                
+                // Update statistics and UI
                 updateStatistics();
-
-                // Enable save button if we have translations
-                if (Object.keys(currentData.translations).length > 0) {
-                    document.getElementById('saveBtn').disabled = false;
+                
+                // Enable save button if we have any translations
+                const saveBtn = document.getElementById('saveBtn');
+                saveBtn.disabled = Object.keys(currentData.translations).length === 0;
+                
+                // Update next button state
+                const nextBtn = document.getElementById('nextBtn');
+                nextBtn.disabled = currentData.processedKeys.size >= currentData.totalEntries;
+                
+                if (currentData.processedKeys.size >= currentData.totalEntries) {
+                    showStatus('All translations completed!', 'success');
                 }
-
-                showStatus('Batch completed successfully!', 'success');
             } catch (error) {
                 console.error('Batch processing error:', error);
                 showStatus('Error processing batch: ' + error.message, 'error');

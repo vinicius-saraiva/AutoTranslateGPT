@@ -1,0 +1,25 @@
+# User Journey
+
+Consider a user who is using the web app for the first time.
+
+The user should perform the following steps:
+
+1. Click on "openaiApiKey" button.
+2. Popup opens up and user enters the api key.
+3. User saves configuration and api key is saved in the local storage.
+
+4. User enters "Localise API Key"
+5. User clicks on "Load Project" button and the project is loaded: The number of total entries is displayed.
+
+6. User selects source language. By default, the source language selected is "English". Save the last selection in local storage. If a language is not available in the .json file as a source language, gray out the button and do not allow the user to select it.
+7. User checks or unchecks the "ignore blank source entries" checkbox. If checked, the web app will not load the entries that are blank in the source language.
+
+8. User selects the target language. By default, the target language selected is "French". Save the last selection in local storage. If a target language is not available in the .json file downloaded, the user should still be able to select it since the web app will generate a new .json file with the target language.
+
+9. User defines the batch size. By default, the batch size is 10. Save the last selection in local storage.
+
+10. User clicks on "Start Translation" button. The first batch is translated by calling OpenAI api. The translations are displayed in the table, and the progress bar is updated.
+
+11. User clicks on "Next Batch" button. The next batch is translated by calling OpenAI api. The translations are displayed in the table, and the progress bar is updated.
+
+12. The user can click on "Save Translations" button and a .json file with the translation is downloaded.
