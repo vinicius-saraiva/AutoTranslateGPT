@@ -274,6 +274,8 @@
                 targetLang: getSelectedLanguage('targetLangGrid'),
                 batchSize: document.getElementById('batchSize').value,
                 ignoreBlank: document.getElementById('ignoreBlank').checked,
+                ignoreTranslated: document.getElementById('ignoreTranslated').checked,
+                onlyEmpty: document.getElementById('onlyEmpty').checked,
                 locoApiKey: document.getElementById('locoApiKey').value
             };
             localStorage.setItem('translationPreferences', JSON.stringify(preferences));
@@ -293,10 +295,13 @@
 
         function updateTableHeaders() {
             const headerRow = document.querySelector('table thead tr');
-            const sourceLangName = getSelectedLanguageName('sourceLangGrid');
-            const targetLangName = getSelectedLanguageName('targetLangGrid');
+            const sourceLangButton = document.querySelector('#sourceLangGrid .lang-button[data-selected="true"]');
+            const targetLangButton = document.querySelector('#targetLangGrid .lang-button[data-selected="true"]');
             
-            if (sourceLangName && targetLangName) {
+            if (sourceLangButton && targetLangButton) {
+                const sourceLangName = sourceLangButton.getAttribute('title');
+                const targetLangName = targetLangButton.getAttribute('title');
+                
                 headerRow.innerHTML = `
                     <th>Asset ID</th>
                     <th>${sourceLangName} (Source)</th>
@@ -369,6 +374,7 @@
                     const batchSize = parseInt(document.getElementById('batchSize').value);
                     const ignoreBlank = document.getElementById('ignoreBlank').checked;
                     const ignoreTranslated = document.getElementById('ignoreTranslated').checked;
+                    const onlyEmpty = document.getElementById('onlyEmpty').checked;
 
                     if (!locoApiKey || !openaiApiKey || !targetLang || !sourceLang) {
                         showStatus('Please fill in all required fields and select both languages', 'error');
@@ -400,16 +406,28 @@
                     let entriesToTranslate = { ...sourceData };
                     let skippedCount = 0;
 
-                    if (ignoreTranslated) {
-                        entriesToTranslate = Object.fromEntries(
-                            Object.entries(sourceData).filter(([key, sourceText]) => {
-                                const existingTranslation = originalTranslations[key];
+                    entriesToTranslate = Object.fromEntries(
+                        Object.entries(sourceData).filter(([key, sourceText]) => {
+                            const existingTranslation = originalTranslations[key];
+                            
+                            // Skip if entry has translation and we only want empty entries
+                            if (onlyEmpty && existingTranslation && existingTranslation.trim() !== '') {
+                                skippedCount++;
+                                return false;
+                            }
+                            
+                            // Skip if entry has translation in target language and ignoreTranslated is checked
+                            if (ignoreTranslated && existingTranslation) {
                                 const shouldTranslate = shouldTranslateEntry(sourceText, existingTranslation, targetLang);
-                                if (!shouldTranslate) skippedCount++;
-                                return shouldTranslate;
-                            })
-                        );
-                    }
+                                if (!shouldTranslate) {
+                                    skippedCount++;
+                                    return false;
+                                }
+                            }
+                            
+                            return true;
+                        })
+                    );
 
                     // Initialize OpenAI client
                     openaiClient = new OpenAI({
@@ -768,6 +786,17 @@
             </label>
         `;
         targetLangSection.appendChild(ignoreTranslatedCheckbox);
+
+        // Add the new checkbox right after
+        const onlyEmptyCheckbox = document.createElement('div');
+        onlyEmptyCheckbox.className = 'checkbox-group';
+        onlyEmptyCheckbox.innerHTML = `
+            <label>
+                <input type="checkbox" id="onlyEmpty" checked>
+                Only translate empty entries
+            </label>
+        `;
+        targetLangSection.appendChild(onlyEmptyCheckbox);
 
         // Update the translation process to skip already translated entries
         function shouldTranslateEntry(sourceText, existingTranslation, targetLang) {
