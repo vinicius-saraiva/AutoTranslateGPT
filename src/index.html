@@ -370,31 +370,21 @@
                     const ignoreBlank = document.getElementById('ignoreBlank').checked;
                     const ignoreTranslated = document.getElementById('ignoreTranslated').checked;
 
-                    // Save preferences
-                    savePreferences();
-
                     if (!locoApiKey || !openaiApiKey || !targetLang || !sourceLang) {
                         showStatus('Please fill in all required fields and select both languages', 'error');
                         return;
                     }
 
-                    // Show loading status
-                    showStatus('Analyzing translations...', 'info');
+                    showStatus('Loading project data...', 'info');
 
-                    // Use the proxy endpoint
+                    // Load translations
                     const response = await fetch(`/api/translations?key=${encodeURIComponent(locoApiKey)}`);
-
-                    if (!response.ok) {
-                        throw new Error(`API error: ${response.status} ${response.statusText}`);
-                    }
-
-                    const data = await response.json();
-                    console.log('Received data:', data);
-
-                    // Flatten the source data
-                    let sourceData = data[sourceLang] || {};
-                    sourceData = flattenObject(sourceData);
+                    if (!response.ok) throw new Error(`API error: ${response.status} ${response.statusText}`);
                     
+                    const data = await response.json();
+                    
+                    // Prepare data
+                    let sourceData = flattenObject(data[sourceLang] || {});
                     if (ignoreBlank) {
                         sourceData = Object.fromEntries(
                             Object.entries(sourceData).filter(([_, value]) => 
@@ -403,16 +393,10 @@
                         );
                     }
 
-                    // Initialize OpenAI client
-                    openaiClient = new OpenAI({
-                        apiKey: openaiApiKey,
-                        dangerouslyAllowBrowser: true
-                    });
-
                     // Get original translations
                     const originalTranslations = flattenObject(data[targetLang] || {});
 
-                    // Filter out already translated entries if checkbox is checked
+                    // Filter out already translated entries if needed
                     let entriesToTranslate = { ...sourceData };
                     let skippedCount = 0;
 
@@ -427,7 +411,13 @@
                         );
                     }
 
-                    // Reset everything for new session
+                    // Initialize OpenAI client
+                    openaiClient = new OpenAI({
+                        apiKey: openaiApiKey,
+                        dangerouslyAllowBrowser: true
+                    });
+
+                    // Set up current data
                     currentData = {
                         englishSource: entriesToTranslate,
                         originalTranslations: originalTranslations,
@@ -440,26 +430,50 @@
                         processedKeys: new Set()
                     };
 
+                    // Clear and set up table
+                    const translationTable = document.getElementById('translationTable');
+                    translationTable.innerHTML = '';
+                    
+                    // Add headers
+                    updateTableHeaders();
+                    
+                    // Load all entries into table with empty new translation column
+                    const allEntries = Object.entries(entriesToTranslate);
+                    allEntries.forEach(([key, sourceText]) => {
+                        const row = translationTable.insertRow();
+                        row.id = `row-${key}`;
+                        
+                        // Key column
+                        const keyCell = row.insertCell();
+                        keyCell.textContent = key;
+                        
+                        // Source text column
+                        const sourceCell = row.insertCell();
+                        sourceCell.textContent = sourceText;
+                        
+                        // Original translation column
+                        const originalCell = row.insertCell();
+                        originalCell.textContent = originalTranslations[key] || '';
+                        
+                        // New translation column (empty for now)
+                        const newCell = row.insertCell();
+                        newCell.id = `translation-${key}`;
+                        newCell.textContent = '';
+                    });
+
                     // Update UI state
                     startBtn.disabled = true;
                     const nextBtn = document.getElementById('nextBtn');
                     const saveBtn = document.getElementById('saveBtn');
                     nextBtn.disabled = currentData.totalEntries === 0;
-                    saveBtn.disabled = false; // Allow saving at any time
-                    
-                    // Clear existing table
-                    const translationTable = document.getElementById('translationTable');
-                    translationTable.innerHTML = '';
-
-                    // Update table headers
-                    updateTableHeaders();
+                    saveBtn.disabled = false;
 
                     // Update statistics
                     updateStatistics();
 
                     const skippedMessage = skippedCount > 0 ? 
                         ` (${skippedCount} entries skipped as already translated)` : '';
-                    showStatus(`Loaded ${currentData.totalEntries} entries to translate${skippedMessage}. Click "Next Batch" to begin translation.`, 'success');
+                    showStatus(`Loaded ${currentData.totalEntries} entries${skippedMessage}. Click "Next Batch" to start translation.`, 'success');
 
                 } catch (error) {
                     console.error('Error:', error);
@@ -771,8 +785,7 @@
             return !document.getElementById('ignoreTranslated').checked;
         }
 
-        // Update your translation process to use this check
-        // Add this check in your processBatch function before translating each entry
+        // Update processBatch to only handle translations
         async function processBatch() {
             try {
                 const entries = Object.entries(currentData.englishSource)
@@ -784,24 +797,28 @@
                     
                     if (shouldTranslateEntry(sourceText, existingTranslation, currentData.targetLang)) {
                         showStatus(`Translating entry ${currentData.processedKeys.size + 1}/${currentData.totalEntries}...`, 'info');
-                        currentData.translations[key] = await translateText(sourceText, currentData.targetLang);
+                        const translation = await translateText(sourceText, currentData.targetLang);
+                        currentData.translations[key] = translation;
+                        
+                        // Update only the new translation cell
+                        const cell = document.getElementById(`translation-${key}`);
+                        if (cell) cell.textContent = translation;
                     } else {
                         currentData.translations[key] = existingTranslation;
+                        const cell = document.getElementById(`translation-${key}`);
+                        if (cell) cell.textContent = existingTranslation;
                         console.log(`Skipping translation for ${key} - already in target language`);
                     }
                     
                     currentData.processedKeys.add(key);
-                    updateTable([[key, sourceText]], { [key]: currentData.translations[key] });
                 }
                 
                 // Update statistics and UI
                 updateStatistics();
                 
-                // Enable save button if we have any translations
                 const saveBtn = document.getElementById('saveBtn');
-                saveBtn.disabled = Object.keys(currentData.translations).length === 0;
+                saveBtn.disabled = false;
                 
-                // Update next button state
                 const nextBtn = document.getElementById('nextBtn');
                 nextBtn.disabled = currentData.processedKeys.size >= currentData.totalEntries;
                 
@@ -812,31 +829,6 @@
                 console.error('Batch processing error:', error);
                 showStatus('Error processing batch: ' + error.message, 'error');
             }
-        }
-
-        // Add updateTable function
-        function updateTable(entries, results) {
-            const table = document.getElementById('translationTable');
-            
-            entries.forEach(([key, sourceText]) => {
-                // Check if row already exists
-                let row = document.querySelector(`tr[data-key="${key}"]`);
-                
-                if (!row) {
-                    // Create new row if it doesn't exist
-                    row = document.createElement('tr');
-                    row.setAttribute('data-key', key);
-                    table.appendChild(row);
-                }
-                
-                // Update row content
-                row.innerHTML = `
-                    <td>${key}</td>
-                    <td>${sourceText}</td>
-                    <td>${currentData.originalTranslations[key] || ''}</td>
-                    <td>${results[key] || ''}</td>
-                `;
-            });
         }
 
         // Add statistics update function
