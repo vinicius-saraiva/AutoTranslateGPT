@@ -1,4 +1,4 @@
-# User Journey
+# API Setup
 
 Consider a user who is using the web app for the first time.
 
@@ -12,6 +12,8 @@ The user should perform the following steps:
 ## Localise API Key Configuration and Project loading
 4. User enters "Localise API Key"
 5. User clicks on "Load Project" button and the project is loaded: The number of total entries is displayed.
+
+# User Journey for single target language translation
 
 ## Source Language Selection and Translation Options
 6. User selects source language. By default, the source language selected is "English". Save the last selection in local storage. If a language is not available in the .json file as a source language, gray out the button and do not allow the user to select it.
@@ -31,4 +33,10 @@ The user should perform the following steps:
 ## Translation Completion and Save
 14. The user can click on "Save Translations" button and a .json file with the translation is downloaded.
 
-## Bulk Translation in all languages
+# User journey for bulk target language translation
+1. User selects source language.
+2. User selects target language (which is the one he will first visualize in the table below) and checks the checkbox "translate to all target languages at once."
+3. User clicks on "Start Translation" and we display in the table the entries and their translations in source and the currently selected target language.
+4. User can click on the arrow and switch through different target languages.
+5. When user clicks on "Next Batch", you start translating in all languages, entry by entry. The translations are displayed in the table and the progress bar is updated per language. I can switch between target languages and the translations that have already been done persist in the table.
+6. Whenever the user whishes, he can click on "Save Translations" and a .json file with the translations in all languages is downloaded.
