@@ -202,6 +202,10 @@
                         Translate to all target languages at once
                     </label>
                 </div>
+                <div class="filter-group">
+                    <input type="checkbox" id="filterCheckbox">
+                    <label for="filterCheckbox">Ignore entries with tag "sameassource"</label>
+                </div>
             </div>
         </div>
     </div>
@@ -308,7 +312,8 @@
                 ignoreBlank: document.getElementById('ignoreBlank').checked,
                 ignoreTranslated: document.getElementById('ignoreTranslated').checked,
                 onlyEmpty: document.getElementById('onlyEmpty').checked,
-                locoApiKey: document.getElementById('locoApiKey').value
+                locoApiKey: document.getElementById('locoApiKey').value,
+                filterCheckbox: document.getElementById('filterCheckbox').checked,
             };
             localStorage.setItem('translationPreferences', JSON.stringify(preferences));
         }
@@ -378,6 +383,7 @@
                 document.getElementById('ignoreBlank').checked = savedPreferences.ignoreBlank !== false;
                 
                 updateTableHeaders();
+                document.getElementById('filterCheckbox').checked = savedPreferences.filterCheckbox || false;
             } catch (error) {
                 console.error('Error loading preferences:', error);
             }
@@ -609,6 +615,7 @@
                     const ignoreBlank = document.getElementById('ignoreBlank').checked;
                     const ignoreTranslated = document.getElementById('ignoreTranslated').checked;
                     const onlyEmpty = document.getElementById('onlyEmpty').checked;
+                    const filterCheckbox = document.getElementById('filterCheckbox').checked;
 
                     if (!locoApiKey || !openaiApiKey || !targetLang || !sourceLang) {
                         showStatus('Please fill in all required fields and select both languages', 'error');
@@ -617,8 +624,13 @@
 
                     showStatus('Loading project data...', 'info');
 
-                    // Load translations
-                    const response = await fetch(`/api/translations?key=${encodeURIComponent(locoApiKey)}`);
+                    // Load translations with filter if checkbox is checked
+                    let url = `/api/translations?key=${locoApiKey}`;
+                    if (filterCheckbox) {
+                        url += '&filter=!sameassource';
+                    }
+
+                    const response = await fetch(url);
                     if (!response.ok) throw new Error(`API error: ${response.status} ${response.statusText}`);
                     
                     const data = await response.json();
@@ -868,6 +880,7 @@
             loadProjectBtn.addEventListener('click', async () => {
                 try {
                     const locoApiKey = document.getElementById('locoApiKey').value;
+                    const filterCheckbox = document.getElementById('filterCheckbox').checked;
 
                     if (!locoApiKey) {
                         showStatus('Please enter your Localise API key', 'error');
@@ -877,15 +890,23 @@
                     // Show loading status
                     showStatus('Loading project data...', 'info');
 
-                    // Use GET request with query parameter as defined in server.js
-                    const response = await fetch(`/api/translations?key=${encodeURIComponent(locoApiKey)}`);
+                    // Simple URL construction without any encoding
+                    let url = `/api/translations?key=${locoApiKey}`;
+                    if (filterCheckbox) {
+                        url += '&filter=!sameassource';
+                    }
 
+                    console.log('DEBUG - Client request URL:', url);
+
+                    const response = await fetch(url);
+                    
                     if (!response.ok) {
                         throw new Error(`API error: ${response.status} ${response.statusText}`);
                     }
 
                     const data = await response.json();
-                    console.log('Received data:', data);
+                    console.log('DEBUG - Received data keys:', Object.keys(data).slice(0, 5));
+                    // ... rest of the code
 
                     // Update statistics
                     const totalEntries = Object.keys(data['en-GB'] || {}).length;
@@ -1142,18 +1163,31 @@
                 return null;
             }
             
-            if (!text || text.trim().length < 10) return null;
+            if (!text || text.trim().length < 10) {
+                console.log('Text too short for detection:', text);
+                return null;
+            }
             
             try {
                 const detectedLang = window.franc(text, {
                     only: Object.values(SUPPORTED_LANGUAGES),
                     minLength: 1
                 });
-                console.log('Detected language:', detectedLang);
                 
-                return Object.keys(SUPPORTED_LANGUAGES).find(
+                // Simpler debug output without franc.all
+                console.log('Language Detection Debug:', {
+                    text: text,
+                    detectedCode: detectedLang,
+                    textLength: text.length,
+                    supportedLanguages: Object.values(SUPPORTED_LANGUAGES)
+                });
+                
+                const detectedLocale = Object.keys(SUPPORTED_LANGUAGES).find(
                     locale => SUPPORTED_LANGUAGES[locale] === detectedLang
                 );
+                
+                console.log('Detected locale:', detectedLocale);
+                return detectedLocale;
             } catch (error) {
                 console.error('Language detection error:', error);
                 return null;

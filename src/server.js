@@ -46,15 +46,33 @@ app.get('/styles.css', (req, res) => {
 // Proxy endpoint for Localise
 app.get('/api/translations', async (req, res) => {
     const apiKey = req.query.key;
+    const filter = req.query.filter;
     
     try {
-        const response = await fetch('https://localise.biz/api/export/all.json', {
+        // Base URL
+        let url = 'https://localise.biz/api/export/all.json';
+        
+        // Add parameters exactly as they appear in the working request
+        if (filter === '!sameassource') {
+            // Don't encode anything, pass the filter exactly as needed
+            url += `?filter=!sameassource&key=${apiKey}`;
+        } else {
+            url += `?key=${apiKey}`;
+        }
+        
+        console.log('DEBUG - Final Localise URL:', url);
+        
+        const response = await fetch(url, {
             headers: {
-                'Authorization': `Loco ${apiKey}`
+                'Accept': 'application/json',
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache'
             }
         });
         
         if (!response.ok) {
+            const errorText = await response.text();
+            console.error('Localise Error Response:', errorText);
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         
