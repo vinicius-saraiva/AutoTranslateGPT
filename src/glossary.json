@@ -1,0 +1,20 @@
+{
+    "account-statement": {
+        "en-GB": "Account statement",
+        "fr-FR": "Extrait de compte",
+        "de-DE": "Kontoauszug",
+        "nl-NL": "Rekeningafschrift",
+        "it-IT": "Estratto conto",
+        "hu-HU": "Számlakivonat",
+        "cs-CZ": "Výpis z účtu",
+        "ro-RO": "Extras de cont",
+        "bg-BG": "Извлечение по сметка",
+        "es-ES": "Extracto de cuenta",
+        "zh-CN": "账户报表"
+    },
+    "flexible-forward": {
+        "en-GB": "Flexible Forward",
+        "fr-FR": "Flexible Forward",
+        "de-DE": "Flexible Forward"
+    }
+}
