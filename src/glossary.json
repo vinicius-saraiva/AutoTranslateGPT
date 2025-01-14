@@ -1,5 +1,5 @@
 {
-    "account-statement": {
+    "account statement": {
         "en-GB": "Account statement",
         "fr-FR": "Extrait de compte",
         "de-DE": "Kontoauszug",
@@ -12,9 +12,40 @@
         "es-ES": "Extracto de cuenta",
         "zh-CN": "账户报表"
     },
-    "flexible-forward": {
-        "en-GB": "Flexible Forward",
-        "fr-FR": "Flexible Forward",
-        "de-DE": "Flexible Forward"
-    }
+    "you":{
+        "en-GB": "You",
+        "fr-FR": "Vous",
+        "de-DE": "Sie",
+        "nl-NL": "U",
+        "it-IT": "Tu",
+        "hu-HU": "Te",
+        "cs-CZ": "Tu",
+        "ro-RO": "Tu",
+        "bg-BG": "Te",
+        "es-ES": "Tu",
+        "zh-CN": "你"
+    },
+    "account":{
+        "en-GB": "Account",
+        "fr-FR": "Compte",
+        "de-DE": "Konto",
+        "nl-NL": "Account",
+        "it-IT": "Conto",
+        "hu-HU": "Számla",
+        "cs-CZ": "Účet",
+        "ro-RO": "Cont",
+        "bg-BG": "Сметка",
+        "es-ES": "Cuenta",
+        "zh-CN": "账户"
+    },
+    "beneficiary":{},
+    "payment":{},
+    "conversion":{},
+    "FX trade":{},
+    "margin call":{},
+    "flexible forward":{},
+    "take-up":{},
+    "fixed forward":{},
+    "dynamic forward":{},
+    "payment tracker":{}
 }

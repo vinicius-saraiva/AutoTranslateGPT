@@ -17,6 +17,16 @@
         // Make franc available globally since our other code needs it
         window.franc = franc;
     </script>
+    <script>
+        // Fetch the glossary file
+        fetch('./glossary.json')
+            .then(response => response.json())
+            .then(data => {
+                window.glossary = data;
+                console.log('Glossary loaded:', window.glossary);
+            })
+            .catch(error => console.error('Error loading glossary:', error));
+    </script>
 </head>
 <body>
     <div class="header">
@@ -1117,22 +1127,94 @@
         }
 
         // Add translateText function
+        function getGlossaryPrompt(text, targetLang) {
+            console.log('Checking glossary for:', text);
+            console.log('Target language:', targetLang);
+            console.log('Available glossary:', window.glossary);
+
+            // Convert language codes
+            const langMapping = {
+                'en-GB': 'en-GB',
+                'fr-FR': 'fr-FR',
+                'de-DE': 'de-DE',
+                'nl-NL': 'nl-NL',
+                'it-IT': 'it-IT',
+                'hu-HU': 'hu-HU',
+                'cs-CZ': 'cs-CZ',
+                'ro-RO': 'ro-RO',
+                'bg-BG': 'bg-BG',
+                'es-ES': 'es-ES',
+                'zh-CN': 'zh-CN'
+            };
+
+            const langCode = langMapping[targetLang];
+            console.log('Mapped language code:', langCode);
+            
+            if (!langCode || !window.glossary) {
+                console.log('Missing langCode or glossary:', { langCode, hasGlossary: !!window.glossary });
+                return '';
+            }
+
+            // Find matching glossary terms
+            const matches = Object.entries(window.glossary).filter(([key]) => {
+                const term = key.toLowerCase();
+                const textLower = text.toLowerCase();
+                const isMatch = textLower.includes(term) || 
+                               textLower.includes(term + 's') || 
+                               textLower.includes(term + "'s") || 
+                               (term === 'you' && textLower.includes('your'));
+                console.log(`Checking term "${term}" against "${textLower}":`, isMatch);
+                return isMatch;
+            });
+
+            console.log('Found matches:', matches);
+
+            if (matches.length === 0) return '';
+
+            // Build prompt addition
+            const translations = matches.map(([key, translations]) => {
+                const translation = translations[langCode];
+                // Check if translation is empty or undefined
+                if (!translation) {
+                    console.log(`Ignoring empty or undefined translation for ${key}`);
+                    return null; // Return null to filter out
+                }
+                console.log(`Getting translation for ${key}:`, translation);
+                return `"${key}": "${translation}"`;
+            }).filter(Boolean); // Filter out null values
+
+            // Only include the glossary prompt if there are valid translations
+            const prompt = translations.length > 0 
+                ? `Please keep in mind the following glossary: ${translations.join(', ')}. ` 
+                : ''; // Empty prompt if no valid translations
+
+            console.log('Final glossary prompt:', prompt);
+            return prompt;
+        }
+
         async function translateText(text, targetLang) {
             try {
+                // Get glossary prompt
+                const glossaryPrompt = getGlossaryPrompt(text, targetLang);
+                console.log('Full system prompt:', `You are a professional translator for a B2B foreign exchange and cross-border payments platform. Translate to ${targetLang}. Important rules: ${glossaryPrompt}Preserve ALL variables...`);
+                
                 const completion = await openaiClient.chat.completions.create({
                     messages: [
                         {
                             role: "system",
-                            content: `You are a professional translator for a B2B foreign exchange and cross-border payments platform. Translate to ${targetLang}. Important rules: Preserve ALL variables without translation, including: %variable%, %%variable%%, {{variable}}. IMPORTANT: Keep ALL HTML tags (<br>, <p>, etc.) exactly as they appear in the original text, including multiple tags like <br><br>. DO NOT translate: HTML tags, URLs. Context: The platform handles currency conversion, international payments, and financial operations for business clients.`                        },
+                            content: `You are a professional translator for a B2B foreign exchange and cross-border payments platform. Translate to ${targetLang}. Important rules: ${glossaryPrompt}Preserve ALL variables without translation, including: %variable%, %%variable%%, {{variable}}. IMPORTANT: Keep ALL HTML tags (<br>, <p>, etc.) exactly as they appear in the original text, including multiple tags like <br><br>. DO NOT translate: HTML tags, URLs. Context: The platform handles currency conversion, international payments, and financial operations for business clients.`
+                        },
                         {
                             role: "user",
                             content: text
                         }
                     ],
-                    model: "gpt-3.5-turbo",
+                    model: "chatgpt-4o-latest",
                 });
 
-                return completion.choices[0].message.content.trim();
+                let translatedText = completion.choices[0].message.content.trim();
+                
+                return translatedText;
             } catch (error) {
                 console.error('Translation error:', error);
                 throw new Error(`Translation failed: ${error.message}`);

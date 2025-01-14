@@ -3,6 +3,8 @@ import cors from 'cors';
 import fetch from 'node-fetch';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import fs from 'fs';
+import { readFile } from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -81,6 +83,31 @@ app.get('/api/translations', async (req, res) => {
     } catch (error) {
         console.error('Error:', error);
         res.status(500).json({ error: error.message });
+    }
+});
+
+// Replace your existing glossary route with this
+app.get('/glossary.json', async (req, res) => {
+    try {
+        const filePath = join(dirname(__dirname), 'src', 'glossary.json');
+        console.log('Reading glossary from:', filePath);
+        
+        const data = await readFile(filePath, 'utf8');
+        console.log('Glossary content:', data.substring(0, 100) + '...'); // Log first 100 chars
+        
+        // Parse to verify it's valid JSON
+        const jsonData = JSON.parse(data);
+        
+        // Send as JSON with proper headers
+        res.json(jsonData);
+        
+    } catch (error) {
+        console.error('Error serving glossary:', error);
+        res.status(500).json({ 
+            error: 'Failed to serve glossary',
+            details: error.message,
+            path: join(dirname(__dirname), 'src', 'glossary.json')
+        });
     }
 });
 
