@@ -36,13 +36,13 @@ app.use(express.static(dirname(__dirname), {
 
 // Serve index.html at the root route
 app.get('/', (req, res) => {
-    res.sendFile(join(dirname(__dirname), 'src', 'index.html'));
+    res.sendFile(join(dirname(__dirname), 'index.html'));
 });
 
 // Explicitly serve the CSS file
 app.get('/styles.css', (req, res) => {
     res.setHeader('Content-Type', 'text/css');
-    res.sendFile(join(dirname(__dirname), 'src', 'styles.css'));
+    res.sendFile(join(dirname(__dirname), 'styles.css'));
 });
 
 // Proxy endpoint for Localise
@@ -89,7 +89,7 @@ app.get('/api/translations', async (req, res) => {
 // Replace your existing glossary route with this
 app.get('/glossary.json', async (req, res) => {
     try {
-        const filePath = join(dirname(__dirname), 'src', 'glossary.json');
+        const filePath = join(dirname(__dirname), 'glossary.json');
         console.log('Reading glossary from:', filePath);
         
         const data = await readFile(filePath, 'utf8');
@@ -106,7 +106,7 @@ app.get('/glossary.json', async (req, res) => {
         res.status(500).json({ 
             error: 'Failed to serve glossary',
             details: error.message,
-            path: join(dirname(__dirname), 'src', 'glossary.json')
+            path: join(dirname(__dirname), 'glossary.json')
         });
     }
 });
