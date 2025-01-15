@@ -13,16 +13,16 @@
         "zh-CN": "账户报表"
     },
     "you":{
-        "en-GB": "You",
+        "en-GB": "you",
         "fr-FR": "Vous",
-        "de-DE": "Sie",
-        "nl-NL": "U",
-        "it-IT": "Tu",
-        "hu-HU": "Te",
-        "cs-CZ": "Tu",
-        "ro-RO": "Tu",
-        "bg-BG": "Te",
-        "es-ES": "Tu",
+        "de-DE": "sie",
+        "nl-NL": "u",
+        "it-IT": "tu",
+        "hu-HU": "te",
+        "cs-CZ": "ty",
+        "ro-RO": "tu",
+        "bg-BG": "te",
+        "es-ES": "tu",
         "zh-CN": "你"
     },
     "account":{

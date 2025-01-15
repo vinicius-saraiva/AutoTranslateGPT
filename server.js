@@ -36,13 +36,18 @@ app.use(express.static(dirname(__dirname), {
 
 // Serve index.html at the root route
 app.get('/', (req, res) => {
-    res.sendFile(join(dirname(__dirname), 'index.html'));
+    res.sendFile(join(__dirname, 'index.html'), (err) => {
+        if (err) {
+            console.error('Error serving index.html:', err);
+            res.status(err.status).send(err.message);
+        }
+    });
 });
 
 // Explicitly serve the CSS file
 app.get('/styles.css', (req, res) => {
     res.setHeader('Content-Type', 'text/css');
-    res.sendFile(join(dirname(__dirname), 'styles.css'));
+    res.sendFile(join(__dirname, 'styles.css'));
 });
 
 // Proxy endpoint for Localise
@@ -89,7 +94,7 @@ app.get('/api/translations', async (req, res) => {
 // Replace your existing glossary route with this
 app.get('/glossary.json', async (req, res) => {
     try {
-        const filePath = join(dirname(__dirname), 'glossary.json');
+        const filePath = join(__dirname, 'glossary.json');
         console.log('Reading glossary from:', filePath);
         
         const data = await readFile(filePath, 'utf8');
@@ -106,7 +111,7 @@ app.get('/glossary.json', async (req, res) => {
         res.status(500).json({ 
             error: 'Failed to serve glossary',
             details: error.message,
-            path: join(dirname(__dirname), 'glossary.json')
+            path: join(__dirname, 'glossary.json')
         });
     }
 });
@@ -117,7 +122,7 @@ app.use((err, req, res, next) => {
     res.status(500).json({ error: err.message });
 });
 
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    console.log(`Server is running on http://localhost:${PORT}`);
 }); 
