@@ -313,6 +313,9 @@
         
         let openaiClient = null;
 
+        // Add this flag at the top with other global variables
+        let isSaving = false;
+
         // Define all necessary functions
         function savePreferences() {
             const preferences = {
@@ -617,7 +620,8 @@
             const startBtn = document.getElementById('startBtn');
             startBtn.addEventListener('click', async () => {
                 try {
-                    const locoApiKey = document.getElementById('locoApiKey').value;
+                    // Always use the current value from the input field
+                    const locoApiKey = document.getElementById('locoApiKey').value.trim();
                     const openaiApiKey = localStorage.getItem('openaiApiKey');
                     const targetLang = getSelectedLanguage('targetLangGrid');
                     const sourceLang = getSelectedLanguage('sourceLangGrid');
@@ -786,35 +790,64 @@
                 processBatch();
             });
 
-            // Add Save button handler
+            // Single save button handler
             const saveBtn = document.getElementById('saveBtn');
-            saveBtn.addEventListener('click', async () => {
+            saveBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                
+                // Prevent multiple clicks
+                if (saveBtn.dataset.saving === 'true') return;
+                saveBtn.dataset.saving = 'true';
+                
                 try {
                     showStatus('Preparing translations for download...', 'info');
                     
-                    // Create an object with translations and unflatten it
+                    // Get all translations for current language from translationResults
+                    const translations = {};
+                    const rows = Array.from(document.getElementById('translationTable').getElementsByTagName('tr'));
+                    
+                    rows.forEach(row => {
+                        if (!row.id) return; // Skip header row
+                        const key = row.id.replace('row-', '');
+                        const translationCell = document.getElementById(`translation-${key}`);
+                        if (translationCell && translationCell.textContent.trim()) {
+                            translations[key] = translationCell.textContent.trim();
+                        }
+                    });
+                    
+                    // Create export data with proper structure
                     const exportData = {
-                        [currentData.targetLang]: unflattenObject(currentData.translations)
+                        [currentData.targetLang]: unflattenObject(translations)
                     };
+
+                    console.log('Final export data:', exportData);
 
                     // Create a Blob with the JSON data
                     const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
                     
                     // Create a download link
                     const downloadLink = document.createElement('a');
-                    downloadLink.href = URL.createObjectURL(blob);
+                    const url = URL.createObjectURL(blob);
+                    downloadLink.href = url;
                     downloadLink.download = `translations_${currentData.targetLang}_${new Date().toISOString().split('T')[0]}.json`;
                     
                     // Trigger the download
                     document.body.appendChild(downloadLink);
                     downloadLink.click();
-                    document.body.removeChild(downloadLink);
+                    
+                    // Cleanup
+                    setTimeout(() => {
+                        URL.revokeObjectURL(url);
+                        document.body.removeChild(downloadLink);
+                        saveBtn.dataset.saving = 'false';
+                    }, 1000);
                     
                     showStatus('Translations downloaded successfully!', 'success');
 
                 } catch (error) {
                     console.error('Error preparing download:', error);
                     showStatus('Error preparing download: ' + error.message, 'error');
+                    saveBtn.dataset.saving = 'false';
                 }
             });
 
@@ -1196,23 +1229,32 @@
             try {
                 // Get glossary prompt
                 const glossaryPrompt = getGlossaryPrompt(text, targetLang);
-                console.log('Full system prompt:', `You are a professional translator for a B2B foreign exchange and cross-border payments platform. Translate to ${targetLang}. Important rules: ${glossaryPrompt}Preserve ALL variables...`);
                 
                 const completion = await openaiClient.chat.completions.create({
                     messages: [
                         {
                             role: "system",
-                            content: `You are a professional translator for a B2B foreign exchange and cross-border payments platform. Translate to ${targetLang}. Important rules: ${glossaryPrompt}Please adapt the case, gender, number, and declination of any glossary terms so that the final translation is grammatically correct. Preserve ALL variables without translation, including: %variable%, %%variable%%, {{variable}}. IMPORTANT: Keep ALL HTML tags (<br>, <p>, etc.) exactly as they appear in the original text, including multiple tags like <br><br>. DO NOT translate: HTML tags, URLs. Context: The platform handles currency conversion, international payments, and financial operations for business clients.`
+                            content: `You are a professional translator for a B2B foreign exchange and cross-border payments platform. Translate to ${targetLang}. Important rules:
+                            1. ${glossaryPrompt}
+                            2. Adapt the case, gender, number, and declination of any glossary terms for grammatical correctness
+                            3. Preserve ALL variables without translation: %variable%, %%variable%%, {{variable}}
+                            4. ONLY include HTML tags that exist in the original text - DO NOT add new ones
+                            5. Keep existing HTML tags (<br>, <p>, etc.) exactly as they appear
+                            6. DO NOT translate: HTML tags, URLs
+                            Context: The platform handles currency conversion, international payments, and financial operations for business clients.`
                         },
                         {
                             role: "user",
-                            content: text
+                            content: `The text to translate is: ${text}`
                         }
                     ],
-                    model: "chatgpt-4o-latest",
+                    model: "gpt-4o-mini",
                 });
 
                 let translatedText = completion.choices[0].message.content.trim();
+                
+                // Remove "The text to translate is:" if it appears in the response
+                translatedText = translatedText.replace(/^The text to translate is:\s*/i, '');
                 
                 return translatedText;
             } catch (error) {
@@ -1450,108 +1492,6 @@
             
             return result;
         }
-
-        function saveTranslations() {
-            alert('Save function called!'); // Simple test
-            console.log('SAVE TRANSLATIONS STARTED'); // Basic console test
-            
-            const translateAll = document.getElementById('translateAll').checked;
-            console.log('Save translations initiated. Translate all:', translateAll);
-            
-            try {
-                if (translateAll) {
-                    // Multi-language export logic...
-                } else {
-                    // Single language export
-                    const currentLang = currentData.targetLang;
-                    console.log('Current language:', currentLang);
-                    
-                    const exportData = {
-                        [currentLang]: {}
-                    };
-                    
-                    // Debug current state
-                    console.log('Current Data State:', {
-                        targetLang: currentData.targetLang,
-                        translationResults: currentData.translationResults,
-                        currentData: currentData
-                    });
-                    
-                    // Get table and verify it exists
-                    const translationTable = document.getElementById('translationTable');
-                    if (!translationTable) {
-                        console.error('Translation table not found!');
-                        return;
-                    }
-                    
-                    const rows = Array.from(translationTable.getElementsByTagName('tr'));
-                    console.log('Found rows:', rows.length);
-                    
-                    // Process each row
-                    rows.forEach((row, index) => {
-                        if (!row.id) {
-                            console.log(`Row ${index} has no ID, skipping`);
-                            return;
-                        }
-                        
-                        const key = row.id.replace('row-', '');
-                        const translationCell = document.getElementById(`translation-${key}`);
-                        
-                        console.log(`Processing row ${index}:`, {
-                            key,
-                            cellFound: !!translationCell,
-                            content: translationCell?.textContent
-                        });
-                        
-                        if (translationCell?.textContent?.trim()) {
-                            exportData[currentLang][key] = translationCell.textContent.trim();
-                            console.log(`Added translation for ${key}:`, translationCell.textContent.trim());
-                        }
-                    });
-                    
-                    console.log('Final export data:', exportData);
-                    
-                    // Only save if we have data
-                    if (Object.keys(exportData[currentLang]).length === 0) {
-                        alert('No translations found to save!');
-                        console.error('No translations to save');
-                        return;
-                    }
-                    
-                    // Create and trigger download
-                    const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    const timestamp = new Date().toISOString().split('T')[0];
-                    a.download = `translations_${currentLang}_${timestamp}.json`;
-                    
-                    // Log before download
-                    console.log('Downloading file:', a.download);
-                    console.log('Content:', JSON.stringify(exportData, null, 2));
-                    
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }
-            } catch (error) {
-                console.error('Error in saveTranslations:', error);
-                alert('Error saving translations: ' + error.message);
-            }
-        }
-
-        // Add this after your existing code
-        document.getElementById('saveBtn').addEventListener('click', function(e) {
-            console.log('Save button clicked');
-            saveTranslations();
-        });
-
-        // Add this after loading the translation data
-        console.log('Initial translation data loaded:', window.translationData);
-        console.log('Initial currentData state:', currentData);
-    </script>
-</body>
-</html> 
+    </script> 
 </body>
 </html> 
