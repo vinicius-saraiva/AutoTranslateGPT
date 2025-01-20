@@ -39,7 +39,19 @@
         "zh-CN": "账户"
     },
     "beneficiary":{},
-    "payment":{},
+    "payment":{
+        "en-GB": "payment",
+        "fr-FR": "paiement",
+        "de-DE": "zahlung",
+        "nl-NL": "betaling",
+        "it-IT": "pagamento",
+        "hu-HU": "fizetés",
+        "cs-CZ": "platba",
+        "ro-RO": "plata",
+        "bg-BG": "плащане",
+        "es-ES": "pago",
+        "zh-CN": "支付"
+    },
     "conversion":{},
     "FX trade":{},
     "margin call":{},
