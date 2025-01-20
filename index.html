@@ -440,112 +440,156 @@
         }
 
         function updateTargetLanguage(newLang) {
-            debugTranslationData(newLang);
+            console.log('Updating target language to:', newLang);
             
-            console.log('DEBUG - Switching to language:', newLang);
-            console.log('DEBUG - Window translation data:', window.translationData);
-            console.log('DEBUG - Current language data:', window.translationData?.[newLang]);
-            
-            // Update the target language selection in the grid
-            document.querySelectorAll('#targetLangGrid .lang-button').forEach(btn => {
-                btn.dataset.selected = btn.dataset.lang === newLang ? 'true' : 'false';
-            });
-            
-            // Update currentData target language
-            currentData.targetLang = newLang;
-            
-            // IMPORTANT: Get original translations from the correct source
-            let originalTranslations = {};
-            
-            if (window.translationData && window.translationData[newLang]) {
-                // Ensure we're getting the correct structure
-                if (typeof window.translationData[newLang] === 'object') {
-                    originalTranslations = flattenObject(window.translationData[newLang]);
-                }
-            }
-            
-            console.log('DEBUG - Original translations after flattening:', originalTranslations);
-            
-            // Get checkbox states
-            const ignoreTranslated = document.getElementById('ignoreTranslated').checked;
-            const onlyEmpty = document.getElementById('onlyEmpty').checked;
-            
-            // Reset progress if needed
-            if (!currentData.translationResults?.[newLang]) {
-                currentData.processedKeys = new Set();
-                currentData.currentBatchProgress = 0;
-                updateProgressBar(0);
-            }
-            
-            // Update table headers
-            updateTableHeaders();
-            
-            let needsTranslationCount = 0;
-            let totalEntries = 0;
-            
-            // Update table content
-            const translationTable = document.getElementById('translationTable');
-            const rows = Array.from(translationTable.getElementsByTagName('tr'));
-            
-            rows.forEach((row, index) => {
-                if (!row.id) return; // Skip header row
-                
-                const key = row.id.replace('row-', '');
-                totalEntries++;
-                
-                // Get all cells in the row
-                const cells = row.getElementsByTagName('td');
-                
-                // Update original translation column (third column)
-                if (cells.length >= 3) {
-                    const originalCell = cells[2];
-                    const originalTranslation = originalTranslations[key] || '';
-                    console.log(`DEBUG - Setting original translation for ${key}:`, originalTranslation);
-                    originalCell.textContent = originalTranslation;
-                }
-                
-                // Update new translation column (fourth column)
-                const translationCell = document.getElementById(`translation-${key}`);
-                if (translationCell) {
-                    const newTranslation = currentData.translationResults?.[newLang]?.[key] || '';
-                    translationCell.textContent = newTranslation;
+            // Simulate clicking "Start Translation" with the new language
+            const startTranslationProcess = async () => {
+                try {
+                    const locoApiKey = document.getElementById('locoApiKey').value;
+                    const filterCheckbox = document.getElementById('filterCheckbox').checked;
                     
-                    // Determine row styling
-                    const hasOriginalTranslation = !!originalTranslations[key];
-                    const isEmpty = !hasOriginalTranslation && !newTranslation;
-                    
-                    if ((hasOriginalTranslation && ignoreTranslated) || (!isEmpty && onlyEmpty)) {
-                        row.style.backgroundColor = '#f5f5f5';
-                        row.style.color = '#999';
-                    } else {
-                        row.style.backgroundColor = '';
-                        row.style.color = '';
-                        needsTranslationCount++;
+                    if (!locoApiKey) {
+                        showStatus('Please enter your Localise API key', 'error');
+                        return;
                     }
+                    
+                    showStatus('Loading project data...', 'info');
+                    
+                    // Use existing window.translationData if available instead of fetching again
+                    if (!window.translationData) {
+                        let url = `/api/translations?key=${locoApiKey}`;
+                        if (filterCheckbox) {
+                            url += '&filter=!sameassource';
+                        }
+                        
+                        const response = await fetch(url);
+                        if (!response.ok) {
+                            throw new Error(`API error: ${response.status} ${response.statusText}`);
+                        }
+                        
+                        window.translationData = await response.json();
+                    }
+                    
+                    // Update UI for new target language
+                    document.querySelectorAll('#targetLangGrid .lang-button').forEach(btn => {
+                        btn.dataset.selected = btn.dataset.lang === newLang ? 'true' : 'false';
+                    });
+                    
+                    // Update language display text
+                    const selectedButton = document.querySelector(`#targetLangGrid .lang-button[data-lang="${newLang}"]`);
+                    if (selectedButton) {
+                        const targetLangName = selectedButton.getAttribute('title');
+                        document.getElementById('currentTargetLang').textContent = targetLangName;
+                        
+                        // Update table headers
+                        document.getElementById('targetHeader1').textContent = `${targetLangName} (Original Translation)`;
+                        document.getElementById('targetHeader2').textContent = `${targetLangName} (New Translation)`;
+                    }
+                    
+                    // Get source and target data
+                    const sourceLang = getSelectedLanguage('sourceLangGrid');
+                    const sourceData = flattenObject(window.translationData[sourceLang] || {});
+                    const targetData = flattenObject(window.translationData[newLang] || {});
+                    
+                    // Get checkbox states
+                    const ignoreTranslated = document.getElementById('ignoreTranslated').checked;
+                    const onlyEmpty = document.getElementById('onlyEmpty').checked;
+                    
+                    // Filter entries based on checkbox states
+                    let entriesToTranslate = {};
+                    let skippedCount = 0;
+                    
+                    Object.entries(sourceData).forEach(([key, sourceText]) => {
+                        const existingTranslation = targetData[key];
+                        const isEmpty = !existingTranslation || existingTranslation.trim() === '';
+                        
+                        let shouldTranslate = true;
+                        
+                        if (onlyEmpty) {
+                            shouldTranslate = isEmpty;
+                        } else if (ignoreTranslated) {
+                            shouldTranslate = !existingTranslation;
+                        }
+                        
+                        if (shouldTranslate) {
+                            entriesToTranslate[key] = sourceText;
+                        } else {
+                            skippedCount++;
+                        }
+                    });
+                    
+                    // Reset currentData for new language
+                    currentData = {
+                        englishSource: sourceData,
+                        targetLang: newLang,
+                        translationQueue: Object.entries(entriesToTranslate),
+                        totalEntries: Object.keys(entriesToTranslate).length,
+                        processedKeys: new Set(),
+                        translationResults: currentData.translationResults || {},
+                        currentBatch: 0,
+                        batchSize: parseInt(document.getElementById('batchSize').value)
+                    };
+                    
+                    // Update UI
+                    document.getElementById('totalEntries').textContent = currentData.totalEntries;
+                    document.getElementById('translatedEntries').textContent = '0';
+                    
+                    // Reset progress bar
+                    const progressFill = document.getElementById('progressFill');
+                    const progressPercentage = document.getElementById('progressPercentage');
+                    progressFill.style.width = '0%';
+                    progressPercentage.textContent = '0%';
+                    
+                    // Update table content
+                    const translationTable = document.getElementById('translationTable');
+                    const rows = Array.from(translationTable.getElementsByTagName('tr'));
+                    
+                    rows.forEach(row => {
+                        if (!row.id) return; // Skip header row
+                        const key = row.id.replace('row-', '');
+                        
+                        // Update original translation column
+                        const originalCell = row.cells[2];
+                        if (originalCell) {
+                            originalCell.textContent = targetData[key] || '';
+                        }
+                        
+                        // Clear new translation column
+                        const newTranslationCell = document.getElementById(`translation-${key}`);
+                        if (newTranslationCell) {
+                            newTranslationCell.textContent = '';
+                        }
+                        
+                        // Update row styling
+                        const hasTranslation = !!targetData[key];
+                        const isEmpty = !hasTranslation;
+                        
+                        if ((hasTranslation && ignoreTranslated) || (!isEmpty && onlyEmpty)) {
+                            row.style.backgroundColor = '#f5f5f5';
+                            row.style.color = '#999';
+                        } else {
+                            row.style.backgroundColor = '';
+                            row.style.color = '';
+                        }
+                    });
+                    
+                    // Update Next Batch button state
+                    const nextBtn = document.getElementById('nextBtn');
+                    nextBtn.disabled = currentData.totalEntries === 0;
+                    
+                    // Show status message
+                    const skippedMessage = skippedCount > 0 ? 
+                        ` (${skippedCount} entries skipped as already translated)` : '';
+                    showStatus(`Loaded ${currentData.totalEntries} entries${skippedMessage}. Click "Next Batch" to start translation.`, 'success');
+                    
+                } catch (error) {
+                    console.error('Error:', error);
+                    showStatus('Error updating target language: ' + error.message, 'error');
                 }
-            });
+            };
             
-            // Update counts and UI
-            currentData.totalEntries = needsTranslationCount;
-            
-            // Update Next Batch button state
-            const nextBtn = document.getElementById('nextBtn');
-            if (nextBtn) {
-                nextBtn.disabled = needsTranslationCount === 0;
-            }
-            
-            // Update statistics
-            updateStatistics(needsTranslationCount, totalEntries);
-            
-            // Save preferences
-            savePreferences();
-
-            // Add this to update the language title in navigation
-            const selectedButton = document.querySelector(`#targetLangGrid .lang-button[data-lang="${newLang}"]`);
-            if (selectedButton) {
-                const languageTitle = selectedButton.getAttribute('title');
-                document.getElementById('currentTargetLang').textContent = languageTitle;
-            }
+            // Execute the process
+            startTranslationProcess();
         }
 
         // Helper function to update progress bar
@@ -1240,7 +1284,7 @@
                             3. Preserve ALL variables without translation: %variable%, %%variable%%, {{variable}}
                             4. ONLY include HTML tags that exist in the original text - DO NOT add new ones
                             5. Keep existing HTML tags (<br>, <p>, etc.) exactly as they appear
-                            6. DO NOT translate: HTML tags, URLs
+                            6. DO NOT translate: HTML tags, URLs, date formats like DD/MM/YYYY HH:mm or similar
                             Context: The platform handles currency conversion, international payments, and financial operations for business clients.`
                         },
                         {
