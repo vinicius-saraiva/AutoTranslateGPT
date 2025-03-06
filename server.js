@@ -34,6 +34,9 @@ app.use(express.static(dirname(__dirname), {
     }
 }));
 
+// Add this near your other app.use statements
+app.use('/assets', express.static(join(__dirname, 'assets')));
+
 // Serve index.html at the root route
 app.get('/', (req, res) => {
     res.sendFile(join(__dirname, 'index.html'), (err) => {
@@ -98,10 +101,15 @@ app.get('/glossary.json', async (req, res) => {
         console.log('Reading glossary from:', filePath);
         
         const data = await readFile(filePath, 'utf8');
-        console.log('Glossary content:', data.substring(0, 100) + '...'); // Log first 100 chars
         
         // Parse to verify it's valid JSON
         const jsonData = JSON.parse(data);
+        
+        // Log specific entries for debugging
+        console.log('Glossary loaded. Sample entries:', {
+            'fixed forward': jsonData['fixed forward'],
+            'total entries': Object.keys(jsonData).length
+        });
         
         // Send as JSON with proper headers
         res.json(jsonData);

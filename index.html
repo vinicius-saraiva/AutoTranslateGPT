@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Translation Manager</title>
+    <title>INDIO - AI Translator</title>
     <!-- Import as ES module -->
     <script type="module">
         import OpenAI from 'https://cdn.jsdelivr.net/npm/openai@4.28.0/+esm'
@@ -27,23 +27,35 @@
             })
             .catch(error => console.error('Error loading glossary:', error));
     </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&family=Ruda:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cg transform='matrix(-1,0,0,1,32,0) scale(0.015625)'%3E%3Cpath fill='%23CC3333' transform='translate(1153)' d='m0 0h142l-7 12-7 10-34 51-7 11 56-8 49-5 42-3 54-2h84l-2 5-13 22-17 28-11 19-12 20-17 28-15 25h81l74 6 52 6 112 14 4 2-6 8-8 11-14 19-16 21-11 14-9 11-11 13-7 8-16 17-13 14-8 7-15 14-11 10-28 22-9 7 9 2 38 6 45 10 28 8 36 12 44 17 86 37 58 25 1 4-10 9-148 148 16 8 26 12 44 24 17 11 21 14 19 14 13 10 14 11 12 9 1 4-185 185-6 7-5 4v2l10 8 14 12 11 9 16 15 28 28 9 11 10 11 9 11 12 15 12 17 13 18 10 15 9 13v3l-32 14-147 63-33 14-5 1 3 5 9 10 11 12 7 8 12 14 13 17 10 12 14 19 14 20 9 13 15 24 12 20 10 17 10 18 9 15-1 3h-28l-56-1-30-2-39-4-41-7-41-9-7-1 14 49 45 157 4 13v4l-2 1h-235l10 35 6 26 5 29 4 38 1 19v65l-6-1-47-16-34-13-39-18-28-15-17-10-22-14-6-4v143l-1 2h-41l-38-3-34-7-20-6-27-10-28-14-16-10-23-16-11-10-8-7-10-9-9-9-9-11-11-13-14-21-8-13v-2h-2l-2 9-10 35-8 20-14 30-6 11-12 19-10 15-6 8-11 13-9 10-9 11-27 27h-3l-7-8-10-10v-2h-2l-7-8-9-9-7-8-8-9-11-14-14-19-16-25-12-22-8-15-14-32-11-31-9-34-8-44-6-43-4-38-2-35v-8l-93 1-191 82-20 8-19 6-19 3-19 1-26-3-20-6-17-8-12-8-11-9-10-10-11-15-7-12-6-15-4-14-2-12v-25l3-18 8-26 8-25 1-195h-99l-1-1v-43l2-26 5-29 7-25 8-22 8-18 12-23 7-11 13-18 8-10 18-21h2v-2l8-7 10-9 6-5-2-4-55-55 1-6h2l2-4 14-19 10-13 14-19 10-13 14-19 10-13 14-19 2-3-1-5-6-10-6-14-3-13-1-15 2-17 4-15 8-16 8-11 11-14 9-11 11-14 10-12 10-13 9-11 8-10 11-14 13-16 5-7h2l2-4 12-12 17-11 17-7 14-4 7-7 5-7h2l2-4 12-14 9-11 8-9 9-11 2-3h2l2-4 13-15 9-11 12-14 6-8h2l2-4 13-15 9-11 12-14 6-8h2l2-4 12-14 22-26 6-8h2l2-4 12-14 9-11 8-9 9-11 2-3h2l2-4 13-15 8-10 8-9 9-11 2-3h2l2-4 12-14 9-11 8-9 9-11 2-3h2l2-4 13-14 7-8 12-13 18-18h2v-2l8-7 11-10 11-9 18-14 12-9 14-10 24-15 21-13 22-11 19-10 36-15 25-9 35-11 30-7 29-6 48-7z'/%3E%3Cpath fill='%23CC3333' transform='translate(365,1033)' d='m0 0h67l1 2v64l-2 2h-65l-1-1z'/%3E%3C/g%3E%3C/svg%3E">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
 </head>
 <body>
     <div class="header">
         <div class="header-content">
             <div class="logo">
-                <img src="https://platform.ibanfirst.com/upload/Cobrands/ibanfirst/favicon.png" alt="Logo" class="logo-img">
-                <span class="logo-text">Translation Service</span>
+                <svg class="logo-img" width="32" height="32" viewBox="0 0 2048 2048" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" transform="matrix(-1,0,0,1,0,0)">
+                    <path transform="translate(1153)" d="m0 0h142l-7 12-7 10-34 51-7 11 56-8 49-5 42-3 54-2h84l-2 5-13 22-17 28-11 19-12 20-17 28-15 25h81l74 6 52 6 112 14 4 2-6 8-8 11-14 19-16 21-11 14-9 11-11 13-7 8-16 17-13 14-8 7-15 14-11 10-28 22-9 7 9 2 38 6 45 10 28 8 36 12 44 17 86 37 58 25 1 4-10 9-148 148 16 8 26 12 44 24 17 11 21 14 19 14 13 10 14 11 12 9 1 4-185 185-6 7-5 4v2l10 8 14 12 11 9 16 15 28 28 9 11 10 11 9 11 12 15 12 17 13 18 10 15 9 13v3l-32 14-147 63-33 14-5 1 3 5 9 10 11 12 7 8 12 14 13 17 10 12 14 19 14 20 9 13 15 24 12 20 10 17 10 18 9 15-1 3h-28l-56-1-30-2-39-4-41-7-41-9-7-1 14 49 45 157 4 13v4l-2 1h-235l10 35 6 26 5 29 4 38 1 19v65l-6-1-47-16-34-13-39-18-28-15-17-10-22-14-6-4v143l-1 2h-41l-38-3-34-7-20-6-27-10-28-14-16-10-23-16-11-10-8-7-10-9-9-9-9-11-11-13-14-21-8-13v-2h-2l-2 9-10 35-8 20-14 30-6 11-12 19-10 15-6 8-11 13-9 10-9 11-27 27h-3l-7-8-10-10v-2h-2l-7-8-9-9-7-8-8-9-11-14-14-19-16-25-12-22-8-15-14-32-11-31-9-34-8-44-6-43-4-38-2-35v-8l-93 1-191 82-20 8-19 6-19 3-19 1-26-3-20-6-17-8-12-8-11-9-10-10-11-15-7-12-6-15-4-14-2-12v-25l3-18 8-26 8-25 1-195h-99l-1-1v-43l2-26 5-29 7-25 8-22 8-18 12-23 7-11 13-18 8-10 18-21h2v-2l8-7 10-9 6-5-2-4-55-55 1-6h2l2-4 14-19 10-13 14-19 10-13 14-19 10-13 14-19 2-3-1-5-6-10-6-14-3-13-1-15 2-17 4-15 8-16 8-11 11-14 9-11 11-14 10-12 10-13 9-11 8-10 11-14 13-16 5-7h2l2-4 12-12 17-11 17-7 14-4 7-7 5-7h2l2-4 12-14 9-11 8-9 9-11 2-3h2l2-4 13-15 9-11 12-14 6-8h2l2-4 13-15 9-11 12-14 6-8h2l2-4 12-14 22-26 6-8h2l2-4 12-14 9-11 8-9 9-11 2-3h2l2-4 13-15 8-10 8-9 9-11 2-3h2l2-4 12-14 9-11 8-9 9-11 2-3h2l2-4 13-14 7-8 12-13 18-18h2v-2l8-7 11-10 11-9 18-14 12-9 14-10 24-15 21-13 22-11 19-10 36-15 25-9 35-11 30-7 29-6 48-7z"/>
+                    <path transform="translate(365,1033)" d="m0 0h67l1 2v64l-2 2h-65l-1-1z"/>
+                    <path transform="translate(888,1828)" d="m0 0"/>
+                    <path transform="translate(760,1811)" d="m0 0"/>
+                    <path transform="translate(780,1203)" d="m0 0"/>
+                </svg>
+                <span class="logo-text">INDIO.tradutor</span>
             </div>
             <div class="header-controls">
                 <div class="api-input-group">
-                    <label for="locoApiKey">Localise API Key:</label>
+                    <label for="locoApiKey">Loco Project API Key:</label>
                     <input type="password" id="locoApiKey" placeholder="Enter your Localise API key">
-                    <button id="loadProjectBtn" class="primary-btn">Load Project</button>
+                    <button id="loadProjectBtn" class="icon-button" title="Load Project">
+                        <span class="material-icons">cloud_upload</span>
+                    </button>
                 </div>
-                <button id="configureBtn" class="configure-btn">
-                    <span class="vega-icon-settings"></span>
-                    OpenAI API Key
+                <button id="configureBtn" class="icon-button" title="OpenAI API Key">
+                    <span class="material-icons">settings</span>
                 </button>
             </div>
         </div>
@@ -83,7 +95,7 @@
         <div class="setup-grid">
             <div class="setup-column">
                 <div>
-                    <label>Source Language:</label>
+                    <h4>Source Language:</h4>
                     <div class="language-grid" id="sourceLangGrid">
                         <!-- Germanic languages -->
                         <button type="button" class="lang-button" data-lang="en-GB" data-selected="true" title="English">
@@ -117,6 +129,9 @@
                         <button type="button" class="lang-button" data-lang="bg-BG" title="Bulgarian">
                             <img src="https://flagcdn.com/w20/bg.png" alt="Bulgarian">
                         </button>
+                        <button type="button" class="lang-button" data-lang="pl-PL" title="Polish">
+                            <img src="https://flagcdn.com/w20/pl.png" alt="Polish">
+                        </button>
 
                         <!-- Other Indo-European -->
                         <button type="button" class="lang-button" data-lang="el-GR" title="Greek">
@@ -143,7 +158,7 @@
             </div>
             <div class="setup-column">
                 <div>
-                    <label>Target Language:</label>
+                    <h4>Target Language:</h4>
                     <div class="language-grid" id="targetLangGrid">
                         <!-- Germanic languages -->
                         <button type="button" class="lang-button" data-lang="en-GB" title="English">
@@ -176,6 +191,9 @@
                         </button>
                         <button type="button" class="lang-button" data-lang="bg-BG" title="Bulgarian">
                             <img src="https://flagcdn.com/w20/bg.png" alt="Bulgarian">
+                        </button>
+                        <button type="button" class="lang-button" data-lang="pl-PL" title="Polish">
+                            <img src="https://flagcdn.com/w20/pl.png" alt="Polish">
                         </button>
 
                         <!-- Other Indo-European -->
@@ -243,12 +261,19 @@
 
     <div class="control-panel">
         <div class="batch-size-container">
-            <label for="batchSize">Batch Size:</label>
-            <input type="number" id="batchSize" value="10" min="1" max="50">
+            <input type="number" 
+                   id="batchSize" 
+                   class="input-with-tooltip" 
+                   placeholder="Batch size" 
+                   title="Batch size" 
+                   min="1" 
+                   value="1000">
         </div>
-        <button id="startBtn">Start Translation</button>
+        <button id="startBtn">Start</button>
         <button id="nextBtn" disabled>Next Batch</button>
-        <button id="saveBtn" disabled>Save Translations</button>
+        <button class="icon-button" title="Save translations" id="saveBtn">
+            <span class="material-icons">save</span>
+        </button>
     </div>
 
     <table>
@@ -406,7 +431,7 @@
         const supportedLanguages = [
             'en-GB', 'de-DE', 'nl-NL', 'fr-FR', 'es-ES', 
             'it-IT', 'ro-RO', 'cs-CZ', 'bg-BG', 'el-GR', 
-            'hu-HU', 'zh-CN'
+            'hu-HU', 'zh-CN', 'pl-PL'
         ];
 
         function getNextLanguage(currentLang) {
@@ -1017,7 +1042,7 @@
             const supportedLanguages = [
                 'en-GB', 'de-DE', 'nl-NL', 'fr-FR', 'es-ES', 
                 'it-IT', 'ro-RO', 'cs-CZ', 'bg-BG', 'el-GR', 
-                'hu-HU', 'zh-CN'
+                'hu-HU', 'zh-CN', 'pl-PL'
             ];
 
             function getNextLanguage(currentLang) {
@@ -1209,6 +1234,11 @@
             console.log('Target language:', targetLang);
             console.log('Available glossary:', window.glossary);
 
+            const normalizedText = text.toLowerCase();
+            console.log('Normalized text:', normalizedText);
+            console.log('Glossary entry found:', window.glossary[normalizedText]);
+            console.log('Glossary translation for target language:', window.glossary[normalizedText]?.[targetLang]);
+
             // Convert language codes
             const langMapping = {
                 'en-GB': 'en-GB',
@@ -1221,7 +1251,8 @@
                 'ro-RO': 'ro-RO',
                 'bg-BG': 'bg-BG',
                 'es-ES': 'es-ES',
-                'zh-CN': 'zh-CN'
+                'zh-CN': 'zh-CN',
+                'pl-PL': 'pl-PL'
             };
 
             const langCode = langMapping[targetLang];
@@ -1285,6 +1316,8 @@
                             4. ONLY include HTML tags that exist in the original text - DO NOT add new ones
                             5. Keep existing HTML tags (<br>, <p>, etc.) exactly as they appear
                             6. DO NOT translate: HTML tags, URLs, date formats like DD/MM/YYYY HH:mm or similar
+                            7. Use terminology and phrasing that is the most commonly used by fintechs and banks in ${targetLang}, prioritizing clarity and naturalness for business clients. When multiple correct translations exist, prefer the one most frequently used in the financial and FX industry.  
+                            8. Prefer terminology commonly used by leading fintech and FX providers such as **Wise, Revolut, and iBanFirst** to ensure industry consistency.  
                             Context: The platform handles currency conversion, international payments, and financial operations for business clients.`
                         },
                         {
@@ -1292,7 +1325,8 @@
                             content: `The text to translate is: ${text}`
                         }
                     ],
-                    model: "gpt-4o-mini",
+                    model: "chatgpt-4o-latest",
+                    temperature: 1,
                 });
 
                 let translatedText = completion.choices[0].message.content.trim();
@@ -1320,7 +1354,8 @@
             'bg-BG': 'bul',  // Bulgarian
             'el-GR': 'ell',  // Greek
             'hu-HU': 'hun',  // Hungarian
-            'zh-CN': 'cmn'   // Chinese
+            'zh-CN': 'cmn',   // Chinese
+            'pl-PL': 'pol'   // Polish
         };
 
         // Add language detection function

@@ -1,10 +1,24 @@
+:root {
+    --brand-color: #CC3333;
+    --success-color: #7CAE7A;
+    --error-color: #7F6A93;
+    --dark-color: #0D0A0B;
+    --neutral-color: #839073;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Ruda', sans-serif;
+    font-weight: 400;
+    margin: 0;
+}
+
 body {
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
     background-color: #f4f5f6;
-    color: #140309;
+    color: var(--dark-color);
     line-height: 1.5;
 }
 
@@ -49,7 +63,7 @@ th, td {
 
 th {
     background-color: #fafafa;
-    color: #666;
+    color: var(--dark-color);
     font-weight: 600;
 }
 
@@ -58,9 +72,9 @@ button {
     border: none;
     border-radius: 4px;
     cursor: pointer;
-    background-color: #28AB84;
+    background-color: var(--brand-color);
     color: white;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 14px;
     font-weight: 500;
     transition: all 0.2s ease;
@@ -71,7 +85,7 @@ button:hover:not(:disabled) {
 }
 
 button:disabled {
-    background-color: #cccccc;
+    background-color: var(--neutral-color);
     cursor: not-allowed;
     opacity: 0.7;
 }
@@ -80,7 +94,7 @@ select, input {
     padding: 8px 12px;
     border-radius: 4px;
     border: 1px solid #E7E7E7;
-    font-family: 'Open Sans', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     font-size: 14px;
 }
 
@@ -88,7 +102,7 @@ select:hover:not(:disabled),
 input:hover:not(:disabled),
 select:focus,
 input:focus {
-    border-color: #28AB84;
+    border-color: var(--brand-color);
     outline: none;
 }
 
@@ -99,14 +113,14 @@ input:focus {
     font-size: 14px;
 }
 
-.error {
-    background-color: rgba(220, 53, 69, 0.1);
-    color: #DC3545;
+.status.error {
+    background-color: rgba(127, 106, 147, 0.1);
+    color: var(--error-color);
 }
 
-.success {
-    background-color: rgba(40, 171, 132, 0.1);
-    color: #28AB84;
+.status.success {
+    background-color: rgba(124, 174, 122, 0.1);
+    color: var(--success-color);
 }
 
 /* Stats container styles */
@@ -137,12 +151,12 @@ input:focus {
 
 .stat-item label {
     font-weight: 500;
-    color: #666;
+    color: var(--neutral-color);
 }
 
 .stat-item span {
-    color: #333;
-    font-family: 'Open Sans', monospace;
+    color: var(--dark-color);
+    font-family: 'Montserrat', monospace;
 }
 
 .progress-container {
@@ -161,7 +175,7 @@ input:focus {
 .progress-fill {
     width: 0%;
     height: 100%;
-    background-color: #28AB84;
+    background-color: var(--success-color);
     transition: width 0.3s ease;
 }
 
@@ -284,12 +298,14 @@ input:focus {
 .logo-img {
     height: 32px;
     width: auto;
+    fill: var(--brand-color);
 }
 
 .logo-text {
-    font-size: 18px;
-    font-weight: 600;
-    color: #140309;
+    font-family: 'Ruda', sans-serif;
+    font-weight: 700;
+    font-size: 24px;
+    color: var(--brand-color);
 }
 
 /* Modal styles */
@@ -360,7 +376,7 @@ input:focus {
 }
 
 .save-btn {
-    background-color: #8f40ff;
+    background-color: var(--brand-color);
     color: white;
 }
 
@@ -392,7 +408,7 @@ input:focus {
 
 .primary-btn {
     align-self: flex-start;
-    background-color: #8f40ff;
+    background-color: var(--brand-color);
     color: white;
     border: none;
     padding: 10px 20px;
@@ -494,9 +510,9 @@ input:focus {
 }
 
 .lang-nav-btn:hover:not(:disabled) {
-    border-color: #28AB84;
-    color: #28AB84;
-    background-color: rgba(40, 171, 132, 0.1);
+    border-color: var(--brand-color);
+    color: var(--brand-color);
+    background-color: rgba(204, 51, 51, 0.1);
 }
 
 #currentTargetLang {
@@ -504,4 +520,108 @@ input:focus {
     color: #333;
     min-width: 100px;
     text-align: center;
+}
+
+/* Style titles with Ruda */
+.logo-text {
+    font-family: 'Ruda', sans-serif;
+    font-weight: 700;
+}
+
+/* Keep Montserrat for all other elements */
+button,
+input,
+select,
+textarea,
+.status,
+.stat-item,
+.progress-container,
+table {
+    font-family: 'Montserrat', sans-serif;
+}
+
+/* Adjust specific title styles */
+.source-language-title,
+.target-language-title {
+    font-size: 18px;
+    margin-bottom: 8px;
+}
+
+/* Update icon-button styles to ensure consistency */
+.icon-button {
+    background: none;
+    border: none;
+    padding: 8px;
+    cursor: pointer;
+    color: var(--brand-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.icon-button:hover {
+    background-color: rgba(204, 51, 51, 0.1); /* brand color with opacity */
+    transform: translateY(-1px);
+}
+
+.icon-button:active {
+    transform: translateY(0px);
+}
+
+.icon-button .material-icons {
+    font-size: 24px;
+}
+
+.icon-button[title] {
+    position: relative;
+}
+
+.icon-button[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 8px;
+    background: var(--dark-color);
+    color: white;
+    font-size: 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-family: 'Montserrat', sans-serif;
+    z-index: 1000;
+}
+
+.input-with-tooltip {
+    padding: 8px;
+    border: 1px solid #E7E7E7;
+    border-radius: 4px;
+    font-family: 'Montserrat', sans-serif;
+    transition: border-color 0.2s ease;
+}
+
+.input-with-tooltip:hover {
+    border-color: var(--brand-color);
+}
+
+/* Add tooltip on hover - matching the save button style */
+.input-with-tooltip[title] {
+    position: relative;
+}
+
+.input-with-tooltip[title]:hover::after {
+    content: attr(title);
+    position: absolute;
+    bottom: -30px;
+    left: 50%;
+    transform: translateX(-50%);
+    padding: 4px 8px;
+    background: var(--dark-color);
+    color: white;
+    font-size: 12px;
+    border-radius: 4px;
+    white-space: nowrap;
+    font-family: 'Montserrat', sans-serif;
 } 
