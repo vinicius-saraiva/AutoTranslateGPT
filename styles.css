@@ -266,7 +266,7 @@ input:focus {
 }
 
 .header {
-    background-color: #fffdf7;
+    background-color: white;
     padding: 16px 24px;
     margin-bottom: 24px;
     border-radius: 8px;
@@ -355,7 +355,7 @@ input:focus {
 
 .modal-content {
     position: relative;
-    background-color: #fffdf7;
+    background-color: white;
     margin: 10vh auto;
     width: 90%;
     max-width: 500px;

@@ -159,3 +159,62 @@ This implementation maintains the local-first approach while providing a secure 
 4. User can click on the arrow and switch through different target languages.
 5. When user clicks on "Next Batch", you start translating in all languages, entry by entry. The translation should start with the language that is currently selected (and displayed) to the client. The translations are displayed in the table and the progress bar is updated per language. I can switch between target languages and the translations that have already been done persist in the table.
 6. Whenever the user whishes, he can click on "Save Translations" and a .json file with the translations in all languages is downloaded.
+
+# Multi-Language Translation Management
+
+## Global Translation Storage
+The application now includes a global storage system that maintains translations across all languages:
+
+```javascript
+const globalTranslations = {
+    translations: {},
+    addTranslation: function(language, assetId, translation) {
+        if (!this.translations[language]) {
+            this.translations[language] = {};
+        }
+        this.translations[language][assetId] = translation;
+    },
+    getTranslations: function(language) {
+        return this.translations[language] || {};
+    },
+    getAllTranslations: function() {
+        return this.translations;
+    }
+};
+```
+
+## Translation Storage Process
+1. When translations are completed for any language, they are automatically saved in two places:
+   - In the `currentData.translationResults` for the current session
+   - In the `globalTranslations` storage for persistent access across language switches
+
+2. Translations are preserved when:
+   - Switching between languages using the arrow buttons
+   - Using the "Save" button for individual languages
+   - Processing new batches of translations
+
+## Download All Translations
+1. A new "Download All" button (cloud_download icon) has been added to the control panel
+2. When clicked, it:
+   - Retrieves all translations from the global storage
+   - Creates a single JSON file containing all languages
+   - Structures the file in Localise.biz format:
+   ```json
+   {
+       "fr-FR": {
+           "key1": "French translation",
+           "key2": "Another French translation"
+       },
+       "de-DE": {
+           "key1": "German translation",
+           "key2": "Another German translation"
+       }
+   }
+   ```
+3. The file is automatically downloaded as 'translations_all_languages.json'
+
+## Benefits
+- No loss of translations when switching between languages
+- Single-file download for all translations
+- Compatible with Localise.biz import format
+- Maintains translation context across the entire session

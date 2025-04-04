@@ -412,5 +412,19 @@
         "es-ES": "utilizar seguros de cambio flexible",
         "zh-CN": "使用灵活锁汇",
         "pl-PL": "Wykorzystaj forward elastyczny"
+    },
+    "invoice assistant": {
+        "en-GB": "Invoice Assistant",
+        "fr-FR": "Invoice Assistant",
+        "de-DE": "Invoice Assistant",
+        "nl-NL": "Invoice Assistant",
+        "it-IT": "Invoice Assistant",
+        "hu-HU": "Invoice Assistant",
+        "cs-CZ": "Invoice Assistant",
+        "ro-RO": "Invoice Assistant",
+        "bg-BG": "Invoice Assistant",
+        "es-ES": "Invoice Assistant",
+        "zh-CN": "Invoice Assistant",
+        "pl-PL": "Invoice Assistant"
     }
 }
