@@ -50,7 +50,6 @@ table {
 }
 
 th, td {
-    width: 25%;
     border: none;
     border-bottom: 1px solid #E7E7E7;
     padding: 12px 16px;
@@ -59,6 +58,39 @@ th, td {
     word-wrap: break-word;
     overflow-wrap: break-word;
     white-space: normal;
+    max-width: 0; /* This helps with text overflow */
+}
+
+/* Set specific column widths */
+th:nth-child(1), td:nth-child(1) { /* Asset ID column */
+    width: 20%;
+}
+
+th:nth-child(2), td:nth-child(2) { /* Source text column */
+    width: 30%;
+}
+
+th:nth-child(3), td:nth-child(3) { /* Original translation column */
+    width: 25%;
+}
+
+th:nth-child(4), td:nth-child(4) { /* New translation column */
+    width: 25%;
+}
+
+/* Ensure text doesn't overflow */
+td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Add hover effect to see full content */
+td:hover {
+    overflow: visible;
+    white-space: normal;
+    position: relative;
+    z-index: 1;
+    background: white;
 }
 
 th {
@@ -375,6 +407,10 @@ input:focus {
     justify-content: flex-end;
 }
 
+.modal.show {
+    display: flex;
+}
+
 .save-btn {
     background-color: var(--brand-color);
     color: white;
@@ -625,3 +661,46 @@ table {
     white-space: nowrap;
     font-family: 'Montserrat', sans-serif;
 } 
+
+.form-group {
+    margin-bottom: 0px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: var(--dark-color);
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid var(--neutral-color);
+    border-radius: 4px;
+    font-family: 'Montserrat', sans-serif;
+    font-size: 14px;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: var(--brand-color);
+}
+
+.modal-buttons {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 24px;
+}
+
+.secondary-btn {
+    background: none;
+    border: 2px solid var(--neutral-color);
+    color: var(--dark-color);
+}
+
+.secondary-btn:hover {
+    border-color: var(--brand-color);
+    color: var(--brand-color);
+}

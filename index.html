@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDIO - AI Translator</title>
+    <title>INDY - AI Translator</title>
     <!-- Import as ES module -->
     <script type="module">
         import OpenAI from 'https://cdn.jsdelivr.net/npm/openai@4.28.0/+esm'
@@ -44,7 +44,7 @@
                     <path transform="translate(760,1811)" d="m0 0"/>
                     <path transform="translate(780,1203)" d="m0 0"/>
                 </svg>
-                <span class="logo-text">INDIO.tradutor</span>
+                <span class="logo-text">INDY.tradutor</span>
             </div>
             <div class="header-controls">
                 <div class="api-input-group">
@@ -52,6 +52,14 @@
                     <input type="password" id="locoApiKey" placeholder="Enter your Localise API key">
                     <button id="loadProjectBtn" class="icon-button" title="Load Project">
                         <span class="material-icons">cloud_upload</span>
+                    </button>
+                </div>
+                <div class="api-input-group">
+                    <select id="projectSelect" class="project-select">
+                        <option value="">Select a project...</option>
+                    </select>
+                    <button id="addProjectBtn" class="icon-button" title="Add Project">
+                        <span class="material-icons">add</span>
                     </button>
                 </div>
                 <button id="configureBtn" class="icon-button" title="OpenAI API Key">
@@ -313,6 +321,35 @@
             </div>
             <div class="modal-footer">
                 <button id="saveApiKeys" class="save-btn">Save Configuration</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Replace the existing project modal HTML -->
+    <div id="projectModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Project Configuration</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="projectForm">
+                    <div class="input-group">
+                        <label for="projectName">Project Name</label>
+                        <input type="text" id="projectName" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="readOnlyKey">Read-only API Key</label>
+                        <input type="password" id="readOnlyKey" required>
+                    </div>
+                    <div class="input-group">
+                        <label for="writeKey">Write API Key</label>
+                        <input type="password" id="writeKey" required>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="save-btn">Save Project</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -871,23 +908,16 @@
                 try {
                     showStatus('Preparing translations for download...', 'info');
                     
-                    // Get all translations for current language from translationResults
-                    const translations = {};
-                    const rows = Array.from(document.getElementById('translationTable').getElementsByTagName('tr'));
+                    // Create export data with all languages
+                    const exportData = {};
                     
-                    rows.forEach(row => {
-                        if (!row.id) return; // Skip header row
-                        const key = row.id.replace('row-', '');
-                        const translationCell = document.getElementById(`translation-${key}`);
-                        if (translationCell && translationCell.textContent.trim()) {
-                            translations[key] = translationCell.textContent.trim();
+                    // Get all translated languages from translationResults
+                    Object.entries(currentData.translationResults).forEach(([lang, translations]) => {
+                        // Only include languages that have translations
+                        if (Object.keys(translations).length > 0) {
+                            exportData[lang] = unflattenObject(translations);
                         }
                     });
-                    
-                    // Create export data with proper structure
-                    const exportData = {
-                        [currentData.targetLang]: unflattenObject(translations)
-                    };
 
                     console.log('Final export data:', exportData);
 
@@ -898,7 +928,7 @@
                     const downloadLink = document.createElement('a');
                     const url = URL.createObjectURL(blob);
                     downloadLink.href = url;
-                    downloadLink.download = `translations_${currentData.targetLang}_${new Date().toISOString().split('T')[0]}.json`;
+                    downloadLink.download = `translations_all_languages_${new Date().toISOString().split('T')[0]}.json`;
                     
                     // Trigger the download
                     document.body.appendChild(downloadLink);
@@ -911,7 +941,7 @@
                         saveBtn.dataset.saving = 'false';
                     }, 1000);
                     
-                    showStatus('Translations downloaded successfully!', 'success');
+                    showStatus('All translations downloaded successfully!', 'success');
 
                 } catch (error) {
                     console.error('Error preparing download:', error);
@@ -1300,7 +1330,7 @@
             return prompt;
         }
 
-        async function translateText(text, targetLang) {
+        async function translateText(text, targetLang, key) {
             try {
                 // Get glossary prompt
                 const glossaryPrompt = getGlossaryPrompt(text, targetLang);
@@ -1309,20 +1339,28 @@
                     messages: [
                         {
                             role: "system",
-                            content: `You are a professional translator for a B2B foreign exchange and cross-border payments platform. Translate to ${targetLang}. Important rules:
+                            content: `You are a professional translator for a B2B foreign exchange and cross-border payments platform. Translate to ${targetLang}.
+                            
+                            These translations are being imported from a translation management platform (Localise.biz) where each asset has a unique ID.
+                            The asset ID provides context about the UI element type (Button/CTA, Title, Label, Error, etc).
+                            
+                            Important rules:
                             1. ${glossaryPrompt}
                             2. Adapt the case, gender, number, and declination of any glossary terms for grammatical correctness
                             3. Preserve ALL variables without translation: %variable%, %%variable%%, {{variable}}
                             4. ONLY include HTML tags that exist in the original text - DO NOT add new ones
                             5. Keep existing HTML tags (<br>, <p>, etc.) exactly as they appear
-                            6. DO NOT translate: HTML tags, URLs, date formats like DD/MM/YYYY HH:mm or similar
-                            7. Use terminology and phrasing that is the most commonly used by fintechs and banks in ${targetLang}, prioritizing clarity and naturalness for business clients. When multiple correct translations exist, prefer the one most frequently used in the financial and FX industry.  
-                            8. Prefer terminology commonly used by leading fintech and FX providers such as **Wise, Revolut, and iBanFirst** to ensure industry consistency.  
+                            6. You must keep at all costs the "/n" and "/t" as they are in the original text like the following example "add a beneficiary in the platform. \n \n If you did not initiate this action"
+                            7. DO NOT translate: HTML tags, URLs, date formats like DD/MM/YYYY HH:mm or similar
+                            8. Use terminology and phrasing that is the most commonly used by fintechs and banks in ${targetLang}, prioritizing clarity and naturalness for business clients. When multiple correct translations exist, prefer the one most frequently used in the financial and FX industry.  
+                            9. Prefer terminology commonly used by leading fintech and FX providers such as **Wise, Revolut, and iBanFirst** to ensure industry consistency.  
+                            
                             Context: The platform handles currency conversion, international payments, and financial operations for business clients.`
                         },
                         {
                             role: "user",
-                            content: `The text to translate is: ${text}`
+                            content: `Asset ID: ${key}
+                            Text to translate: ${text}`
                         }
                     ],
                     model: "chatgpt-4o-latest",
@@ -1456,7 +1494,7 @@
                         
                         for (const targetLang of targetLanguages) {
                             try {
-                                const translation = await translateText(sourceText, targetLang);
+                                const translation = await translateText(sourceText, targetLang, key);
                                 
                                 // Store in results
                                 currentData.translationResults[targetLang][key] = translation;
@@ -1489,7 +1527,7 @@
 
                     for (const [key, sourceText] of entries) {
                         showStatus(`Translating entry ${currentData.processedKeys.size + 1}/${currentData.totalEntries}...`, 'info');
-                        const translation = await translateText(sourceText, currentData.targetLang);
+                        const translation = await translateText(sourceText, currentData.targetLang, key);
                         
                         // Store translation
                         currentData.translationResults[currentData.targetLang][key] = translation;
@@ -1571,6 +1609,117 @@
             
             return result;
         }
+
+
+                // Project management
+        const projectModal = document.getElementById('projectModal');
+        const projectForm = document.getElementById('projectForm');
+        const projectSelect = document.getElementById('projectSelect');
+        const addProjectBtn = document.getElementById('addProjectBtn');
+
+        // Load projects on page load
+        async function loadProjects() {
+            try {
+                const response = await fetch('/api/projects');
+                const projects = await response.json();
+                
+                // Clear existing options except the placeholder
+                projectSelect.innerHTML = '<option value="">Select a project...</option>';
+                
+                // Add projects to select
+                projects.forEach(project => {
+                    const option = document.createElement('option');
+                    option.value = project.readOnlyKey;
+                    option.textContent = project.name;
+                    projectSelect.appendChild(option);
+                });
+
+                // Select last used project if any
+                const lastProject = localStorage.getItem('lastProject');
+                if (lastProject) {
+                    projectSelect.value = lastProject;
+                    if (projectSelect.value) { // If project exists
+                        loadProject(projectSelect.value);
+                    }
+                }
+            } catch (error) {
+                showStatus('Error loading projects: ' + error.message, 'error');
+            }
+        }
+
+        // Show modal to add new project
+        addProjectBtn.addEventListener('click', () => {
+            projectModal.classList.add('show');
+            projectForm.reset();
+        });
+
+        // Add this to your existing JavaScript section
+        const closeProjectModalBtn = projectModal.querySelector('.close-modal');
+
+        // Close modal when clicking the X button
+        closeProjectModalBtn.addEventListener('click', () => {
+            projectModal.classList.remove('show');
+        });
+
+        // Optional: Close modal when clicking outside
+        projectModal.addEventListener('click', (e) => {
+            if (e.target === projectModal) {
+                projectModal.classList.remove('show');
+            }
+        });
+
+        // Handle project form submission
+        projectForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const projectData = {
+                name: document.getElementById('projectName').value,
+                readOnlyKey: document.getElementById('readOnlyKey').value,
+                writeKey: document.getElementById('writeKey').value
+            };
+
+            try {
+                const response = await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(projectData)
+                });
+
+                const result = await response.json();
+                
+                if (result.error) {
+                    throw new Error(result.error);
+                }
+
+                // Reload projects and close modal
+                await loadProjects();
+                projectModal.classList.remove('show');
+                projectForm.reset();
+                
+                // Select the new project
+                projectSelect.value = projectData.readOnlyKey;
+                loadProject(projectData.readOnlyKey);
+                
+                showStatus('Project added successfully', 'success');
+            } catch (error) {
+                showStatus('Error adding project: ' + error.message, 'error');
+            }
+        });
+
+        // Handle project selection
+        projectSelect.addEventListener('change', (e) => {
+            const apiKey = e.target.value;
+            if (apiKey) {
+                localStorage.setItem('lastProject', apiKey);
+                loadProject(apiKey);
+            }
+        });
+
+        // Load projects on page load
+        document.addEventListener('DOMContentLoaded', loadProjects);
+
     </script> 
 </body>
 </html> 

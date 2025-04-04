@@ -13,6 +13,125 @@ The user should perform the following steps:
 4. User enters "Localise API Key"
 5. User clicks on "Load Project" button and the project is loaded: The number of total entries is displayed.
 
+### Project management implementation
+#### Initial Setup
+1. Create projects.json file structure:
+'''
+json
+{
+"projects": [
+{
+"name": "Project Name",
+"readOnlyKey": "loco-read-only-key",
+"writeKey": "loco-write-key",
+"lastUsed": "2024-02-20T10:00:00Z"
+}
+]
+}
+'''
+
+2. Add to .gitignore: projects.json
+
+
+#### Server-side Implementation (server.js)
+1. Add new endpoints:
+   - GET `/api/projects` - Returns list of projects (names and read keys)
+   - POST `/api/projects` - Adds new project
+   - PUT `/api/projects/:name` - Updates project
+   - DELETE `/api/projects/:name` - Removes project
+
+2. Add file operations:
+   - Check if projects.json exists on startup
+   - Create it with empty projects array if missing
+   - Read/Write functions for projects.json
+
+#### UI Implementation (index.html)
+1. Replace API key input with:
+   - Project dropdown
+   - "+" button to add new project
+   - Project management modal
+
+2. Add project management modal with:
+   - Project Name input
+   - Read-only API Key input
+   - Write API Key input
+   - Save/Cancel buttons
+
+3. Update header controls:
+'''
+html
+<div class="header-controls">
+<div class="project-selector">
+<select id="projectSelect">
+<option value="">Select a project...</option>
+</select>
+<button class="icon-button" title="Add Project">
+<span class="material-icons">add</span>
+</button>
+</div>
+</div>
+'''
+
+#### User Flow
+1. First Time Setup:
+   - If no projects.json exists:
+     - Show "Add Project" modal automatically
+     - Guide user to enter first project
+
+2. Normal Operation:
+   - Load project list on page load
+   - Populate dropdown with project names
+   - Store selected project in localStorage
+   - Auto-select last used project on load
+
+3. Adding New Project:
+   - Click "+" button
+   - Fill project details
+   - Save to projects.json
+   - Update dropdown
+   - Select new project
+
+4. Project Selection:
+   - Choose project from dropdown
+   - Automatically use read-only key
+   - Store selection in localStorage
+   - Load project data
+
+## Security Considerations
+1. File Security:
+   - Never commit projects.json
+   - Provide projects.example.json
+   - Document setup in README.md
+
+2. Data Handling:
+   - Store only on local machine
+   - No external transmission of keys
+   - Clear documentation of security practices
+
+#### Error Handling
+1. File Operations:
+   - Handle missing projects.json
+   - Validate file structure
+   - Handle read/write errors
+
+2. User Input:
+   - Validate API keys format
+   - Prevent duplicate project names
+   - Show clear error messages
+
+## Testing Steps
+1. File Operations:
+   - Create/read/update/delete projects
+   - Handle invalid file data
+   - Test file permissions
+
+2. UI Operations:
+   - Add/select/remove projects
+   - Validate form inputs
+   - Test error scenarios
+
+This implementation maintains the local-first approach while providing a secure and user-friendly way to manage multiple Loco projects.
+
 # User Journey for single target language translation
 
 ## Source Language Selection and Translation Options

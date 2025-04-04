@@ -3,7 +3,7 @@ import cors from 'cors';
 import fetch from 'node-fetch';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
-import fs from 'fs';
+import fs from 'fs/promises';
 import { readFile } from 'fs/promises';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -121,6 +121,126 @@ app.get('/glossary.json', async (req, res) => {
             details: error.message,
             path: join(__dirname, 'glossary.json')
         });
+    }
+});
+
+// Project management functions
+async function initializeProjectsFile() {
+    const projectsPath = join(__dirname, 'projects.json');
+    try {
+        await fs.access(projectsPath);
+    } catch {
+        // File doesn't exist, create it with empty projects array
+        await fs.writeFile(projectsPath, JSON.stringify({ projects: [] }, null, 2));
+    }
+}
+
+async function readProjects() {
+    const projectsPath = join(__dirname, 'projects.json');
+    try {
+        const data = await fs.readFile(projectsPath, 'utf8');
+        return JSON.parse(data);
+    } catch (error) {
+        console.error('Error reading projects:', error);
+        throw new Error('Failed to read projects');
+    }
+}
+
+async function writeProjects(projects) {
+    const projectsPath = join(__dirname, 'projects.json');
+    try {
+        await fs.writeFile(projectsPath, JSON.stringify(projects, null, 2));
+    } catch (error) {
+        console.error('Error writing projects:', error);
+        throw new Error('Failed to write projects');
+    }
+}
+
+// Initialize projects.json on server start
+initializeProjectsFile().catch(console.error);
+
+// Project management endpoints
+app.get('/api/projects', async (req, res) => {
+    try {
+        const { projects } = await readProjects();
+        // Only send necessary information (exclude write keys)
+        const safeProjects = projects.map(({ name, readOnlyKey }) => ({
+            name,
+            readOnlyKey
+        }));
+        res.json(safeProjects);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.post('/api/projects', async (req, res) => {
+    try {
+        const { name, readOnlyKey, writeKey } = req.body;
+        
+        // Validate inputs
+        if (!name || !readOnlyKey || !writeKey) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        const { projects } = await readProjects();
+        
+        // Check for duplicate names
+        if (projects.some(p => p.name === name)) {
+            return res.status(400).json({ error: 'Project name already exists' });
+        }
+
+        // Add new project
+        projects.push({
+            name,
+            readOnlyKey,
+            writeKey,
+            lastUsed: new Date().toISOString()
+        });
+
+        await writeProjects({ projects });
+        res.json({ success: true, name });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.put('/api/projects/:name', async (req, res) => {
+    try {
+        const { name } = req.params;
+        const updates = req.body;
+        
+        const { projects } = await readProjects();
+        const index = projects.findIndex(p => p.name === name);
+        
+        if (index === -1) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        // Update project
+        projects[index] = { ...projects[index], ...updates };
+        await writeProjects({ projects });
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+});
+
+app.delete('/api/projects/:name', async (req, res) => {
+    try {
+        const { name } = req.params;
+        const { projects } = await readProjects();
+        
+        const filteredProjects = projects.filter(p => p.name !== name);
+        
+        if (filteredProjects.length === projects.length) {
+            return res.status(404).json({ error: 'Project not found' });
+        }
+
+        await writeProjects({ projects: filteredProjects });
+        res.json({ success: true });
+    } catch (error) {
+        res.status(500).json({ error: error.message });
     }
 });
 

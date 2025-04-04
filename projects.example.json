@@ -1,0 +1,10 @@
+{
+  "projects": [
+    {
+      "name": "Example Project",
+      "readOnlyKey": "your-read-only-key-here",
+      "writeKey": "your-write-key-here",
+      "lastUsed": "2024-02-20T10:00:00Z"
+    }
+  ]
+} 
