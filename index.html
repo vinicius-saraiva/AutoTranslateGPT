@@ -287,28 +287,32 @@
         </button>
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th colspan="4" class="language-navigation">
-                    <div class="language-nav-container">
-                        <button class="lang-nav-btn" id="prevLang">←</button>
-                        <span id="currentTargetLang"></span>
-                        <button class="lang-nav-btn" id="nextLang">→</button>
-                    </div>
-                </th>
-            </tr>
-            <tr>
-                <th>Asset ID</th>
-                <th id="sourceHeader">English (Source)</th>
-                <th id="targetHeader1">Original Translation</th>
-                <th id="targetHeader2">New Translation</th>
-            </tr>
-        </thead>
-        <tbody id="translationTable">
-            <!-- Translations will be inserted here -->
-        </tbody>
-    </table>
+    <div class="table-container">
+        <div class="table-wrapper">
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="4" class="language-navigation">
+                            <div class="language-nav-container">
+                                <button class="lang-nav-btn" id="prevLang">←</button>
+                                <span id="currentTargetLang"></span>
+                                <button class="lang-nav-btn" id="nextLang">→</button>
+                            </div>
+                        </th>
+                    </tr>
+                    <tr>
+                        <th>Asset ID</th>
+                        <th id="sourceHeader">English (Source)</th>
+                        <th id="targetHeader1">Original Translation</th>
+                        <th id="targetHeader2">New Translation</th>
+                    </tr>
+                </thead>
+                <tbody id="translationTable">
+                    <!-- Translations will be inserted here -->
+                </tbody>
+            </table>
+        </div>
+    </div>
 
     <div id="apiModal" class="modal">
         <div class="modal-content">
@@ -394,6 +398,18 @@
         };
         
         let openaiClient = null;
+
+        // Add this function to initialize OpenAI client
+        function initializeOpenAIClient() {
+            const openaiApiKey = localStorage.getItem('openaiApiKey');
+            if (!openaiApiKey) {
+                throw new Error('OpenAI API key not found. Please configure it first.');
+            }
+            openaiClient = new OpenAI({
+                apiKey: openaiApiKey,
+                dangerouslyAllowBrowser: true
+            });
+        }
 
         // Add this flag at the top with other global variables
         let isSaving = false;
@@ -583,7 +599,9 @@
                     
                     Object.entries(sourceData).forEach(([key, sourceText]) => {
                         const existingTranslation = targetData[key];
-                        const isEmpty = !existingTranslation || existingTranslation.trim() === '';
+                        const isEmpty = !existingTranslation || 
+                            (Array.isArray(existingTranslation) ? existingTranslation.length === 0 : 
+                             (typeof existingTranslation === 'string' ? existingTranslation.trim() === '' : true));
                         
                         let shouldTranslate = true;
                         
@@ -674,22 +692,175 @@
             startTranslationProcess();
         }
 
-        // Helper function to update progress bar
+        // Add this function near the top with other utility functions
+        function updateTabTitle(progress = null) {
+            if (progress !== null) {
+                document.title = `(${Math.round(progress)}%) INDY.tradutor`;
+            } else {
+                document.title = 'INDY.tradutor';
+            }
+        }
+
+        // Update the updateProgressBar function
         function updateProgressBar(percentage) {
             const progressFill = document.getElementById('progressFill');
             const progressPercentage = document.getElementById('progressPercentage');
             if (progressFill && progressPercentage) {
                 progressFill.style.width = `${percentage}%`;
                 progressPercentage.textContent = `${Math.round(percentage)}%`;
+                // Update tab title with the same percentage
+                updateTabTitle(percentage);
             }
         }
 
-        // Helper function to update statistics
-        function updateStatistics(needsTranslation, total) {
-            const statsDisplay = document.getElementById('statsDisplay');
-            if (statsDisplay) {
-                statsDisplay.textContent = `Entries to translate: ${needsTranslation} / Total entries: ${total}`;
+        // Update the processBatch function to handle title updates
+        async function processBatch() {
+            const nextBtn = document.getElementById('nextBtn');
+            nextBtn.classList.add('loading');
+            nextBtn.textContent = 'Translating...';
+            
+            try {
+                const translateAll = document.getElementById('translateAll').checked;
+                
+                // Initialize translation queue if empty
+                if (currentData.translationQueue.length === 0) {
+                    currentData.translationQueue = Object.entries(currentData.englishSource)
+                        .filter(([key]) => !currentData.processedKeys.has(key));
+                }
+                
+                // Get next batch of entries
+                const entries = currentData.translationQueue.slice(0, currentData.batchSize);
+
+                if (translateAll) {
+                    // Get all target languages excluding the source language
+                    const targetLanguages = supportedLanguages.filter(lang => lang !== currentData.sourceLang);
+                    showStatus(`Translating entries to ${targetLanguages.length} languages...`, 'info');
+
+                    for (const [key, sourceText] of entries) {
+                        showStatus(`Translating entry ${currentData.processedKeys.size + 1}/${currentData.totalEntries} for all languages...`, 'info');
+                        
+                        // Translate for each target language
+                        for (const targetLang of targetLanguages) {
+                            try {
+                                // Check if we already have this translation
+                                if (globalTranslations.getTranslations(targetLang)[key]) {
+                                    console.log(`Skipping already translated entry ${key} for language ${targetLang}`);
+                                    continue; // Skip if already translated for this language
+                                }
+
+                                const translation = await translateText(sourceText, targetLang, key);
+                                
+                                // Store in global translations
+                                globalTranslations.addTranslation(targetLang, key, translation);
+                                
+                                // Also store in currentData for UI consistency
+                                if (!currentData.translationResults[targetLang]) {
+                                    currentData.translationResults[targetLang] = {};
+                                }
+                                currentData.translationResults[targetLang][key] = translation;
+                                
+                                console.log(`Translated ${key} to ${targetLang}: ${translation}`);
+                                
+                                // Update UI if this is the current target language
+                                if (targetLang === currentData.targetLang) {
+                                    const cell = document.getElementById(`translation-${key}`);
+                                    if (cell) cell.textContent = translation;
+                                }
+                            } catch (error) {
+                                console.error(`Error translating ${key} to ${targetLang}:`, error);
+                                showStatus(`Error translating to ${targetLang}: ${error.message}`, 'error');
+                            }
+                        }
+                        
+                        // Mark as processed after translating to all languages
+                        currentData.processedKeys.add(key);
+                        // Remove from queue
+                        currentData.translationQueue = currentData.translationQueue.filter(([k]) => k !== key);
+                        
+                        // Update progress
+                        updateStatistics();
+                    }
+                } else {
+                    // Single language translation
+                    if (!currentData.translationResults[currentData.targetLang]) {
+                        currentData.translationResults[currentData.targetLang] = {};
+                    }
+
+                    for (const [key, sourceText] of entries) {
+                        showStatus(`Translating entry ${currentData.processedKeys.size + 1}/${currentData.totalEntries}...`, 'info');
+                        const translation = await translateText(sourceText, currentData.targetLang, key);
+                        
+                        // Store translation in both places
+                        currentData.translationResults[currentData.targetLang][key] = translation;
+                        globalTranslations.addTranslation(currentData.targetLang, key, translation);
+                        
+                        // Update UI
+                        const cell = document.getElementById(`translation-${key}`);
+                        if (cell) cell.textContent = translation;
+                        
+                        currentData.processedKeys.add(key);
+                        // Remove processed entry from queue
+                        currentData.translationQueue = currentData.translationQueue.filter(([k]) => k !== key);
+                        
+                        // Update statistics and progress after each translation
+                        updateStatistics();
+                    }
+                }
+
+                // Update UI state
+                const saveBtn = document.getElementById('saveBtn');
+                saveBtn.disabled = false;
+                nextBtn.disabled = currentData.translationQueue.length === 0;
+                
+                if (currentData.translationQueue.length === 0) {
+                    showStatus('All translations completed!', 'success');
+                    updateTabTitle();
+                }
+
+            } catch (error) {
+                console.error('Batch processing error:', error);
+                showStatus('Error processing batch: ' + error.message, 'error');
+                updateTabTitle();
+            } finally {
+                nextBtn.classList.remove('loading');
+                nextBtn.textContent = 'Next Batch';
             }
+        }
+
+        // Add title reset when starting new translation
+        document.getElementById('startBtn').addEventListener('click', async () => {
+            try {
+                // Reset the title at the start
+                updateTabTitle();
+                // ... rest of the existing start button code ...
+            } catch (error) {
+                console.error('Error:', error);
+                showStatus('Error: ' + error.message, 'error');
+                updateTabTitle();
+                startBtn.disabled = false;
+            }
+        });
+
+        // Initialize title when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTabTitle();
+            // ... rest of your existing DOMContentLoaded code ...
+        });
+
+        // Add statistics update function
+        function updateStatistics() {
+            const totalEntries = Object.keys(currentData.englishSource || {}).length;
+            const translatedEntries = currentData.processedKeys.size;
+            const progressPercentage = totalEntries ? Math.round((translatedEntries / totalEntries) * 100) : 0;
+
+            // Update all UI elements
+            document.getElementById('totalEntries').textContent = totalEntries;
+            document.getElementById('translatedEntries').textContent = translatedEntries;
+            document.getElementById('progressPercentage').textContent = `${progressPercentage}%`;
+            document.getElementById('progressFill').style.width = `${progressPercentage}%`;
+            
+            // Update tab title with the same percentage
+            updateTabTitle(progressPercentage);
         }
 
         function setupNavigationButtons() {
@@ -746,6 +917,9 @@
             const startBtn = document.getElementById('startBtn');
             startBtn.addEventListener('click', async () => {
                 try {
+                    // Initialize OpenAI client first
+                    initializeOpenAIClient();
+                    
                     // Always use the current value from the input field
                     const locoApiKey = document.getElementById('locoApiKey').value.trim();
                     const openaiApiKey = localStorage.getItem('openaiApiKey');
@@ -775,15 +949,21 @@
                     
                     const data = await response.json();
                     
+                    // Helper function to check if a value is empty
+                    function isValueEmpty(value) {
+                        if (!value) return true;
+                        if (Array.isArray(value)) return value.length === 0;
+                        if (typeof value === 'string') return value.trim() === '';
+                        return false;
+                    }
+
                     // Prepare data
                     let sourceData = flattenObject(data[sourceLang] || {});
-                    if (ignoreBlank) {
-                        sourceData = Object.fromEntries(
-                            Object.entries(sourceData).filter(([_, value]) => 
-                                value && typeof value === 'string' && value.trim() !== ''
-                            )
-                        );
-                    }
+                    
+                    // Always filter out empty source strings, regardless of ignoreBlank setting
+                    sourceData = Object.fromEntries(
+                        Object.entries(sourceData).filter(([_, value]) => !isValueEmpty(value))
+                    );
 
                     // Get original translations
                     const originalTranslations = flattenObject(data[targetLang] || {});
@@ -794,12 +974,25 @@
 
                     entriesToTranslate = Object.fromEntries(
                         Object.entries(sourceData).filter(([key, sourceText]) => {
+                            // Skip empty source strings
+                            if (isValueEmpty(sourceText)) {
+                                skippedCount++;
+                                return false;
+                            }
+
                             const existingTranslation = originalTranslations[key];
                             
                             // Skip if entry has translation and we only want empty entries
-                            if (onlyEmpty && existingTranslation && existingTranslation.trim() !== '') {
-                                skippedCount++;
-                                return false;
+                            if (onlyEmpty && existingTranslation) {
+                                if (Array.isArray(existingTranslation)) {
+                                    if (existingTranslation.length > 0) {
+                                        skippedCount++;
+                                        return false;
+                                    }
+                                } else if (typeof existingTranslation === 'string' && existingTranslation.trim() !== '') {
+                                    skippedCount++;
+                                    return false;
+                                }
                             }
                             
                             // Skip if entry has translation in target language and ignoreTranslated is checked
@@ -921,14 +1114,13 @@
             saveBtn.addEventListener('click', async (e) => {
                 e.preventDefault();
                 
-                // Prevent multiple clicks
                 if (saveBtn.dataset.saving === 'true') return;
                 saveBtn.dataset.saving = 'true';
                 
                 try {
                     showStatus('Preparing translations for download...', 'info');
                     
-                    // Get all translations for current language from translationResults
+                    // Get all translations for current language
                     const translations = {};
                     const rows = Array.from(document.getElementById('translationTable').getElementsByTagName('tr'));
                     
@@ -938,15 +1130,11 @@
                         const translationCell = document.getElementById(`translation-${key}`);
                         if (translationCell && translationCell.textContent.trim()) {
                             translations[key] = translationCell.textContent.trim();
-                            // Also save to global storage
-                            globalTranslations.addTranslation(currentData.targetLang, key, translationCell.textContent.trim());
                         }
                     });
                     
-                    // Create export data with proper structure
-                    const exportData = {
-                        [currentData.targetLang]: unflattenObject(translations)
-                    };
+                    // For single language export, we don't wrap in language code
+                    const exportData = unflattenObject(translations);
 
                     console.log('Final export data:', exportData);
 
@@ -1362,6 +1550,11 @@
 
         async function translateText(text, targetLang, key) {
             try {
+                // Ensure OpenAI client is initialized
+                if (!openaiClient) {
+                    initializeOpenAIClient();
+                }
+                
                 // Get glossary prompt
                 const glossaryPrompt = getGlossaryPrompt(text, targetLang);
                 
@@ -1377,14 +1570,18 @@
                             Important rules:
                             1. ${glossaryPrompt}
                             2. Adapt the case, gender, number, and declination of any glossary terms for grammatical correctness
-                            3. Preserve ALL variables without translation: %variable%, %%variable%%, {{variable}}
+                            3. CRITICAL: Variables must be preserved EXACTLY as they appear, including the underscores:
+                               - __variable__ → Keep as __variable__ (e.g., "__total__" should stay as "__total__")
+                               - %variable% → Keep as %variable%
+                               - %%variable%% → Keep as %%variable%%
+                               - {{variable}} → Keep as {{variable}}
                             4. ONLY include HTML tags that exist in the original text - DO NOT add new ones
                             5. Keep existing HTML tags (<br>, <p>, etc.) exactly as they appear
                             6. You must keep at all costs the "/n" and "/t" as they are in the original text like the following example "add a beneficiary in the platform. \n \n If you did not initiate this action"
                             7. DO NOT translate: HTML tags, URLs, date formats like DD/MM/YYYY HH:mm or similar
                             8. Use terminology and phrasing that is the most commonly used by fintechs and banks in ${targetLang}, prioritizing clarity and naturalness for business clients. When multiple correct translations exist, prefer the one most frequently used in the financial and FX industry.  
                             9. Prefer terminology commonly used by leading fintech and FX providers such as **Wise, Revolut, and iBanFirst** to ensure industry consistency.  
-                            
+                            10. NEVER include the asset ID in your translation. Only return the translated text itself.
                             Context: The platform handles currency conversion, international payments, and financial operations for business clients.`
                         },
                         {
@@ -1393,8 +1590,8 @@
                             Text to translate: ${text}`
                         }
                     ],
-                    model: "chatgpt-4o-latest",
-                    temperature: 1,
+                    model: "gpt-4o",
+                    temperature: 0.2,
                 });
 
                 let translatedText = completion.choices[0].message.content.trim();
@@ -1470,7 +1667,10 @@
             // If no existing translation, always translate
             if (!existingTranslation) return true;
             
-            // Detect language of existing translation
+            // If it's an array, we'll translate it
+            if (Array.isArray(existingTranslation)) return true;
+            
+            // For strings, detect language
             const detectedLang = detectLanguage(existingTranslation);
             
             // If we can't detect the language (too short/ambiguous) or 
@@ -1481,174 +1681,20 @@
             return !document.getElementById('ignoreTranslated').checked;
         }
 
-        // Update processBatch function
-        async function processBatch() {
-            const nextBtn = document.getElementById('nextBtn');
-            nextBtn.classList.add('loading');
-            nextBtn.textContent = 'Translating...';
-            
-            try {
-                const translateAll = document.getElementById('translateAll').checked;
-                
-                // Initialize translation queue if empty
-                if (currentData.translationQueue.length === 0) {
-                    currentData.translationQueue = Object.entries(currentData.englishSource)
-                        .filter(([key]) => !currentData.processedKeys.has(key));
+        // Update the filter for empty entries
+        function filterEmptyEntries(entries) {
+            return Object.entries(entries).filter(([_, value]) => {
+                if (Array.isArray(value)) {
+                    return value.length > 0;
                 }
-                
-                // Get next batch of entries
-                const entries = currentData.translationQueue.slice(0, currentData.batchSize);
-
-                if (translateAll) {
-                    // Initialize storage for all languages
-                    if (!currentData.translationResults) {
-                        currentData.translationResults = {};
-                    }
-
-                    // Get all target languages except source
-                    const targetLanguages = supportedLanguages.filter(lang => 
-                        lang !== currentData.sourceLang && 
-                        document.querySelector(`#targetLangGrid .lang-button[data-lang="${lang}"]`)
-                    );
-
-                    // Initialize storage for each language
-                    targetLanguages.forEach(lang => {
-                        if (!currentData.translationResults[lang]) {
-                            currentData.translationResults[lang] = {};
-                        }
-                    });
-
-                    // Process each entry for all languages
-                    for (const [key, sourceText] of entries) {
-                        showStatus(`Translating entry ${currentData.processedKeys.size + 1}/${currentData.totalEntries} to all languages...`, 'info');
-                        
-                        for (const targetLang of targetLanguages) {
-                            try {
-                                const translation = await translateText(sourceText, targetLang, key);
-                                
-                                // Store in results
-                                currentData.translationResults[targetLang][key] = translation;
-                                
-                                // Save to global storage
-                                globalTranslations.addTranslation(targetLang, key, translation);
-                                
-                                // Update UI if this is the current target language
-                                if (targetLang === currentData.targetLang) {
-                                    const cell = document.getElementById(`translation-${key}`);
-                                    if (cell) cell.textContent = translation;
-                                }
-                                
-                                // Update progress
-                                currentData.processedLanguages.add(targetLang);
-                                
-                            } catch (error) {
-                                console.error(`Error translating to ${targetLang}:`, error);
-                                showStatus(`Error translating to ${targetLang}: ${error.message}`, 'error');
-                            }
-                        }
-                        
-                        currentData.processedKeys.add(key);
-                        // Remove processed entry from queue
-                        currentData.translationQueue = currentData.translationQueue.filter(([k]) => k !== key);
-                        updateStatistics();
-                    }
-                } else {
-                    // Single language translation
-                    if (!currentData.translationResults[currentData.targetLang]) {
-                        currentData.translationResults[currentData.targetLang] = {};
-                    }
-
-                    for (const [key, sourceText] of entries) {
-                        showStatus(`Translating entry ${currentData.processedKeys.size + 1}/${currentData.totalEntries}...`, 'info');
-                        const translation = await translateText(sourceText, currentData.targetLang, key);
-                        
-                        // Store translation in both places
-                        currentData.translationResults[currentData.targetLang][key] = translation;
-                        globalTranslations.addTranslation(currentData.targetLang, key, translation);
-                        
-                        // Update UI
-                        const cell = document.getElementById(`translation-${key}`);
-                        if (cell) cell.textContent = translation;
-                        
-                        currentData.processedKeys.add(key);
-                        // Remove processed entry from queue
-                        currentData.translationQueue = currentData.translationQueue.filter(([k]) => k !== key);
-                        updateStatistics();
-                    }
+                if (typeof value === 'string') {
+                    return value.trim() !== '';
                 }
-
-                // Update UI state
-                const saveBtn = document.getElementById('saveBtn');
-                saveBtn.disabled = false;
-                nextBtn.disabled = currentData.translationQueue.length === 0;
-                
-                if (currentData.translationQueue.length === 0) {
-                    showStatus('All translations completed!', 'success');
-                }
-
-                // Update progress bar
-                const progress = ((currentData.totalEntries - currentData.translationQueue.length) / currentData.totalEntries) * 100;
-                document.getElementById('progressFill').style.width = `${progress}%`;
-                document.getElementById('progressPercentage').textContent = `${Math.round(progress)}%`;
-
-                // Log the current state of translations
-                console.log('Current translations in global storage:', globalTranslations.getAllTranslations());
-
-            } catch (error) {
-                console.error('Batch processing error:', error);
-                showStatus('Error processing batch: ' + error.message, 'error');
-            } finally {
-                nextBtn.classList.remove('loading');
-                nextBtn.textContent = 'Next Batch';
-            }
+                return !!value;
+            });
         }
 
-        // Add statistics update function
-        function updateStatistics() {
-            const totalEntries = Object.keys(currentData.englishSource || {}).length;
-            const translatedEntries = currentData.processedKeys.size;
-            const progressPercentage = totalEntries ? Math.round((translatedEntries / totalEntries) * 100) : 0;
-
-            document.getElementById('totalEntries').textContent = totalEntries;
-            document.getElementById('translatedEntries').textContent = translatedEntries;
-            document.getElementById('progressPercentage').textContent = `${progressPercentage}%`;
-            document.getElementById('progressFill').style.width = `${progressPercentage}%`;
-        }
-
-        // Add helper function to flatten nested objects
-        function flattenObject(obj, prefix = '') {
-            return Object.keys(obj).reduce((acc, key) => {
-                const pre = prefix.length ? prefix + '.' : '';
-                if (typeof obj[key] === 'object' && obj[key] !== null && !Array.isArray(obj[key])) {
-                    Object.assign(acc, flattenObject(obj[key], pre + key));
-                } else {
-                    acc[pre + key] = obj[key];
-                }
-                return acc;
-            }, {});
-        }
-
-        // Add helper function to unflatten object for export
-        function unflattenObject(obj) {
-            const result = {};
-            
-            for (const key in obj) {
-                const keys = key.split('.');
-                let current = result;
-                
-                for (let i = 0; i < keys.length - 1; i++) {
-                    current[keys[i]] = current[keys[i]] || {};
-                    current = current[keys[i]];
-                }
-                
-                current[keys[keys.length - 1]] = obj[key];
-            }
-            
-            return result;
-        }
-
-
-                // Project management
+        // Project management
         const projectModal = document.getElementById('projectModal');
         const projectForm = document.getElementById('projectForm');
         const projectSelect = document.getElementById('projectSelect');
@@ -1757,12 +1803,11 @@
         // Load projects on page load
         document.addEventListener('DOMContentLoaded', loadProjects);
 
-        // Add download all button handler
+        // Add download all button handler - keeping language codes
         const downloadAllBtn = document.getElementById('downloadAllBtn');
         downloadAllBtn.addEventListener('click', async (e) => {
             e.preventDefault();
             
-            // Prevent multiple clicks
             if (downloadAllBtn.dataset.downloading === 'true') return;
             downloadAllBtn.dataset.downloading = 'true';
             
@@ -1772,20 +1817,20 @@
                 // Get all translations from global storage
                 const allTranslations = globalTranslations.getAllTranslations();
                 
-                // Create export data with proper structure for all languages
+                // Create export data with language code structure preserved
                 const exportData = {};
                 Object.entries(allTranslations).forEach(([lang, translations]) => {
+                    // Unflatten the translations for this language
                     exportData[lang] = unflattenObject(translations);
                 });
 
                 console.log('Final export data for all languages:', exportData);
                 
-                // Create and trigger download
                 const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = 'translations_all_languages.json';
+                a.download = `translations_all_languages_${new Date().toISOString().split('T')[0]}.json`;
                 document.body.appendChild(a);
                 a.click();
                 document.body.removeChild(a);
@@ -1809,6 +1854,96 @@
             window.location.reload();
         });
 
+        // Add helper function to flatten nested objects
+        function flattenObject(obj, prefix = '') {
+            return Object.keys(obj).reduce((acc, key) => {
+                const pre = prefix.length ? prefix + '.' : '';
+                const baseKey = pre + key;
+                
+                if (Array.isArray(obj[key])) {
+                    // Handle arrays: first item uses base key, subsequent use index
+                    obj[key].forEach((item, index) => {
+                        const currentKey = index === 0 ? baseKey : `${baseKey}.${index}`;
+                        acc[currentKey] = item;
+                    });
+                } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+                    Object.assign(acc, flattenObject(obj[key], baseKey));
+                } else {
+                    acc[baseKey] = obj[key];
+                }
+                return acc;
+            }, {});
+        }
+
+        // Helper function to check if a key represents an array item
+        function isArrayKey(key) {
+            return key.match(/\.\d+$/);
+        }
+
+        // Helper function to get base key without array index
+        function getBaseKey(key) {
+            return key.replace(/\.\d+$/, '');
+        }
+
+        // Helper function to handle our special array format
+        function unflattenObject(obj) {
+            const result = {};
+            const arrayKeys = new Set();
+            
+            // First pass: identify all array keys
+            Object.keys(obj).forEach(key => {
+                if (isArrayKey(key)) {
+                    arrayKeys.add(getBaseKey(key));
+                }
+            });
+            
+            // Second pass: build the object
+            Object.entries(obj).forEach(([key, value]) => {
+                const keys = key.split('.');
+                let current = result;
+                
+                for (let i = 0; i < keys.length; i++) {
+                    const currentKey = keys[i];
+                    const nextKey = keys[i + 1];
+                    const fullKeyUpToHere = keys.slice(0, i + 1).join('.');
+                    
+                    // Check if this is part of an array
+                    if (arrayKeys.has(fullKeyUpToHere) || arrayKeys.has(getBaseKey(fullKeyUpToHere))) {
+                        // Initialize array if needed
+                        if (!current[currentKey]) {
+                            current[currentKey] = [];
+                        }
+                        
+                        if (isArrayKey(fullKeyUpToHere)) {
+                            // This is an indexed item
+                            const index = parseInt(keys[i].match(/\d+$/)[0]);
+                            // Ensure array has enough space
+                            while (current.length <= index) {
+                                current.push("");
+                            }
+                            current[index] = value;
+                            break;
+                        } else if (i === keys.length - 1) {
+                            // This is the base array item (index 0)
+                            current[currentKey][0] = value;
+                            break;
+                        }
+                        
+                        current = current[currentKey];
+                    } else if (i === keys.length - 1) {
+                        // Regular property
+                        current[currentKey] = value;
+                    } else {
+                        current[currentKey] = current[currentKey] || {};
+                        current = current[currentKey];
+                    }
+                }
+            });
+            
+            return result;
+        }
+
+        // ... rest of your existing code ...
     </script> 
 </body>
 </html> 

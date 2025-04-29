@@ -14,12 +14,15 @@ h1, h2, h3, h4, h5, h6 {
 
 body {
     font-family: 'Montserrat', sans-serif;
+    width: 100%;
     max-width: 1200px;
+    min-width: 320px;
     margin: 0 auto;
     padding: 20px;
     background-color: #f4f5f6;
     color: var(--dark-color);
     line-height: 1.5;
+    overflow-x: hidden;
 }
 
 .setup-container {
@@ -39,13 +42,13 @@ body {
 
 table {
     width: 100%;
+    min-width: 800px;
     max-width: 100%;
     border-collapse: collapse;
-    margin-top: 20px;
+    margin-top: 0;
     background: white;
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-    overflow: hidden;
     table-layout: fixed;
 }
 
@@ -342,26 +345,31 @@ input:focus {
 
 /* Modal styles */
 .modal {
-    display: none;
     position: fixed;
     top: 0;
     left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(20, 3, 9, 0.5);
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
     z-index: 1000;
-    animation: fadeIn 0.2s ease-out;
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
 }
 
 .modal-content {
     position: relative;
-    background-color: white;
-    margin: 10vh auto;
-    width: 90%;
+    width: 100%;
     max-width: 500px;
-    border-radius: 16px;
-    box-shadow: 0 4px 24px rgba(0,0,0,0.15);
-    animation: slideDown 0.3s ease-out;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin: auto;
 }
 
 .modal-header {
@@ -703,4 +711,119 @@ table {
 .secondary-btn:hover {
     border-color: var(--brand-color);
     color: var(--brand-color);
+}
+
+/* Base viewport settings */
+html {
+    min-width: 320px;
+    overflow-x: hidden;
+}
+
+/* Ensure table stays responsive */
+.table-container {
+    width: 100%;
+    overflow-x: auto;
+    margin-top: 20px;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 1024px) {
+    body {
+        padding: 10px;
+    }
+
+    .header-content {
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .header-controls {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .api-input-group {
+        width: 100%;
+    }
+}
+
+@media screen and (max-width: 768px) {
+    .setup-grid {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+
+    .control-panel {
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .stats-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .language-grid {
+        justify-content: center;
+    }
+}
+
+/* Fix for dev tools view */
+@media screen and (max-height: 800px) {
+    body {
+        padding: 10px;
+    }
+
+    .setup-container {
+        padding: 10px;
+    }
+
+    .stats-container {
+        padding: 10px;
+    }
+
+    .header {
+        position: sticky;
+        top: 0;
+        background: #f4f5f6;
+        z-index: 100;
+        padding: 10px 0;
+    }
+}
+
+/* Ensure proper scrolling behavior */
+.table-wrapper {
+    position: relative;
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+/* Fix for modal positioning */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    display: none;
+    justify-content: center;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    overflow-y: auto;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+.modal-content {
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: white;
+    border-radius: 8px;
+    padding: 20px;
+    margin: auto;
 }
