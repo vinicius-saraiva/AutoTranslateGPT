@@ -12,7 +12,8 @@
         "es-ES": "Extracto de cuenta",
         "zh-CN": "账户报表",
         "pl-PL": "Wyciąg z rachunku",
-        "el-GR": "Κίνηση λογαριασμού"
+        "el-GR": "Κίνηση λογαριασμού",
+        "pt-PT": "Extrato de conta"
     },
     "you": {
         "en-GB": "you",
@@ -27,7 +28,8 @@
         "es-ES": "tu",
         "zh-CN": "你",
         "pl-PL": "Ty",
-        "el-GR": "Εσείς"
+        "el-GR": "Εσείς",
+        "pt-PT": "você"
     },
     "account": {
         "en-GB": "account",
@@ -42,12 +44,14 @@
         "es-ES": "cuenta",
         "zh-CN": "账户",
         "pl-PL": "Konto",
-        "el-GR": "Λογαριασμός"
+        "el-GR": "Λογαριασμός",
+        "pt-PT": "conta"
     },
     "beneficiary": {
         "en-GB": "beneficiary",
         "pl-PL": "Beneficjent",
-        "el-GR": "Δικαιούχος"
+        "el-GR": "Δικαιούχος",
+        "pt-PT": "beneficiário"
     },
     "payment": {
         "en-GB": "payment",
@@ -62,7 +66,8 @@
         "es-ES": "pago",
         "zh-CN": "付款方式",
         "pl-PL": "Płatność",
-        "el-GR": "Πληρωμή"
+        "el-GR": "Πληρωμή",
+        "pt-PT": "pagamento"
     },
     "conversion": {
         "en-GB": "conversion",
@@ -77,7 +82,8 @@
         "es-ES": "conversión",
         "zh-CN": "改装",
         "pl-PL": "Wymiana",
-        "el-GR": "Μετατροπή"
+        "el-GR": "Μετατροπή",
+        "pt-PT": "conversão"
     },
     "margin call": {
         "en-GB": "margin call",
@@ -92,7 +98,8 @@
         "es-ES": "ajuste de márgenes",
         "zh-CN": "追加保证金",
         "pl-PL": "Depozyt zabezpieczający",
-        "el-GR": "κάλυψη περιθωρίου"
+        "el-GR": "κάλυψη περιθωρίου",
+        "pt-PT": "chamada de margem"
     },
     "payment tracker": {
         "en-GB": "payment tracker",
@@ -106,7 +113,8 @@
         "bg-BG": "payment tracker",
         "es-ES": "payment tracker",
         "zh-CN": "payment tracker",
-        "el-GR": "payment tracker"
+        "el-GR": "payment tracker",
+        "pt-PT": "payment tracker"
     },
     "dynamic forward": {
         "en-GB": "dynamic forward",
@@ -121,7 +129,8 @@
         "es-ES": "seguro de cambio dinámico",
         "zh-CN": "动态前进",
         "pl-PL": "Forward dynamiczny",
-        "el-GR": "Dynamic forward"
+        "el-GR": "Dynamic forward",
+        "pt-PT": "forward dinâmico"
     },
     "total dynamic forward": {
         "en-GB": "total dynamic forward",
@@ -135,7 +144,8 @@
         "bg-BG": "общ динамичен форуърд",
         "es-ES": "total seguro de cambio dinámico",
         "pl-PL": "Forward dynamiczny suma",
-        "el-GR": "Total dynamic forward"
+        "el-GR": "Total dynamic forward",
+        "pt-PT": "forward dinâmico total"
     },
     "capped dynamic forward": {
         "en-GB": "capped dynamic forward",
@@ -149,7 +159,8 @@
         "bg-BG": "динамичен форуърд с горен лимит",
         "es-ES": "seguro de cambio dinámico limitado",
         "pl-PL": "Forward z maksymalnym udziałem",
-        "el-GR": "Capped dynamic forward"
+        "el-GR": "Capped dynamic forward",
+        "pt-PT": "forward dinâmico com limite"
     },
     "partial dynamic forward": {
         "en-GB": "partial dynamic forward",
@@ -163,7 +174,8 @@
         "bg-BG": "частичен динамичен форуърд",
         "es-ES": "seguro de cambio dinámico parcial",
         "pl-PL": "Forward z częściowym udziałem",
-        "el-GR": "Partial dynamic forward"
+        "el-GR": "Partial dynamic forward",
+        "pt-PT": "forward dinâmico parcial"
     },
     "capped knock in dynamic forward": {
         "en-GB": "capped knock in dynamic forward",
@@ -177,7 +189,8 @@
         "bg-BG": "асиметричен \"удар\" при динамичен форуърд",
         "es-ES": "seguro de cambio dinámico con barrera knock-in limitado",
         "pl-PL": "Forward z maksymalnym inicjowanym udziałem",
-        "el-GR": "Capped knock in dynamic forward"
+        "el-GR": "Capped knock in dynamic forward",
+        "pt-PT": "forward dinâmico com knock-in limitado"
     },
     "knock in dynamic forward": {
         "en-GB": "knock in dynamic forward",
@@ -191,7 +204,8 @@
         "bg-BG": "асиметричен \"удар\" при динамичен форуърд",
         "es-ES": "seguro de cambio dinámico con barrera knock-in",
         "pl-PL": "Forward z inicjowanym udziałem",
-        "el-GR": "Knock in dynamic forward"
+        "el-GR": "Knock in dynamic forward",
+        "pt-PT": "forward dinâmico com knock-in"
     },
     "asymmetric dynamic forward": {
         "en-GB": "asymmetric dynamic forward",
@@ -205,7 +219,8 @@
         "bg-BG": "асиметричен динамичен форуърд",
         "es-ES": "seguro de cambio dinámico asimétrico",
         "pl-PL": "Forward asymetryczny",
-        "el-GR": "Asymmetric dynamic forward"
+        "el-GR": "Asymmetric dynamic forward",
+        "pt-PT": "forward dinâmico assimétrico"
     },
     "capped asymmetric dynamic forward": {
         "en-GB": "capped asymmetric dynamic forward",
@@ -219,7 +234,8 @@
         "bg-BG": "асиметричен динамичен форуърд с горен лимит",
         "es-ES": "seguro de cambio dinámico asimétrico limitado",
         "pl-PL": "Forward asymetryczny z maksymalnym udziałem",
-        "el-GR": "Capped asymmetric dynamic forward"
+        "el-GR": "Capped asymmetric dynamic forward",
+        "pt-PT": "forward dinâmico assimétrico com limite"
     },
     "asymmetric knock in dynamic forward": {
         "en-GB": "asymmetric knock in dynamic forward",
@@ -233,7 +249,8 @@
         "bg-BG": "асиметричен \"удар\" при динамичен форуърд",
         "es-ES": "seguro de cambio dinámico con barrera knock-in asimétrica",
         "pl-PL": "Forward asymetryczny z inicjowanym udziałem",
-        "el-GR": "Asymmetric knock in dynamic forward"
+        "el-GR": "Asymmetric knock in dynamic forward",
+        "pt-PT": "forward dinâmico assimétrico com knock-in"
     },
     "dynamic forward premium": {
         "en-GB": "dynamic forward premium",
@@ -247,7 +264,8 @@
         "bg-BG": "динамичен форуърд премиум",
         "es-ES": "prima de seguro de cambio dinámico",
         "pl-PL": "Forward premium",
-        "el-GR": "Dynamic forward premium"
+        "el-GR": "Dynamic forward premium",
+        "pt-PT": "prémio de forward dinâmico"
     },
     "total": {
         "en-GB": "total",
@@ -262,7 +280,8 @@
         "es-ES": "total",
         "zh-CN": "完全的",
         "pl-PL": "Suma",
-        "el-GR": "συνολικής"
+        "el-GR": "συνολικής",
+        "pt-PT": "total"
     },
     "partial": {
         "en-GB": "partial",
@@ -277,7 +296,8 @@
         "es-ES": "parcial",
         "zh-CN": "部分的",
         "pl-PL": "Częściowy",
-        "el-GR": "Μερικής"
+        "el-GR": "Μερικής",
+        "pt-PT": "parcial"
     },
     "capped": {
         "en-GB": "capped",
@@ -292,7 +312,8 @@
         "es-ES": "limitado",
         "zh-CN": "有上限的",
         "pl-PL": "Maksymalny udział",
-        "el-GR": "Capped"
+        "el-GR": "Capped",
+        "pt-PT": "limitado"
     },
     "capped knock-in": {
         "en-GB": "capped knock-in",
@@ -307,7 +328,8 @@
         "es-ES": "barrera knock-in limitada",
         "zh-CN": "有上限的触碰生效",
         "pl-PL": "Inicjowany maksymalny udział",
-        "el-GR": "Capped knock-in"
+        "el-GR": "Capped knock-in",
+        "pt-PT": "knock-in limitado"
     },
     "knock-in": {
         "en-GB": "knock-in",
@@ -322,7 +344,8 @@
         "es-ES": "barrera knock-in",
         "zh-CN": "触碰生效",
         "pl-PL": "Inicjowany",
-        "el-GR": "Knock-in"
+        "el-GR": "Knock-in",
+        "pt-PT": "knock-in"
     },
     "asymmetric": {
         "en-GB": "asymmetric",
@@ -337,7 +360,8 @@
         "es-ES": "asimétrico",
         "zh-CN": "不对称的",
         "pl-PL": "Asymetryczny",
-        "el-GR": "Asymmetric"
+        "el-GR": "Asymmetric",
+        "pt-PT": "assimétrico"
     },
     "capped asymmetric": {
         "en-GB": "capped asymmetric",
@@ -352,7 +376,8 @@
         "es-ES": "asimétrico limitado",
         "zh-CN": "有上限的不对称",
         "pl-PL": "Asymetryczny z maksymalnym udziałem",
-        "el-GR": "Capped asymmetric"
+        "el-GR": "Capped asymmetric",
+        "pt-PT": "assimétrico limitado"
     },
     "knock-in asymmetric": {
         "en-GB": "knock-in asymmetric",
@@ -367,7 +392,8 @@
         "es-ES": "barrera knock-in asimétrica",
         "zh-CN": "触碰生效的不对称",
         "pl-PL": "Asymetryczny inicjowany",
-        "el-GR": "Knock-in asymmetric"
+        "el-GR": "Knock-in asymmetric",
+        "pt-PT": "knock-in assimétrico"
     },
     "capped knock-in asymmetric": {
         "en-GB": "capped knock-in asymmetric",
@@ -382,7 +408,8 @@
         "es-ES": "barrera knock-in asimétrica limitada",
         "zh-CN": "有上限的触碰生效不对称",
         "pl-PL": "Asymetryczny inicjowany z maksymalnym udziałem",
-        "el-GR": "Capped knock-in asymmetric"
+        "el-GR": "Capped knock-in asymmetric",
+        "pt-PT": "knock-in assimétrico limitado"
     },
     "flexible forward": {
         "en-GB": "flexible forward",
@@ -397,7 +424,8 @@
         "es-ES": "seguro de cambio flexible",
         "zh-CN": "灵活锁汇",
         "pl-PL": "Forward elastyczny",
-        "el-GR": "Ευέλικτο προθεσμιακό συμβόλαιαο"
+        "el-GR": "Ευέλικτο προθεσμιακό συμβόλαιαο",
+        "pt-PT": "forward flexível"
     },
     "fixed forward": {
         "en-GB": "fixed forward",
@@ -412,7 +440,8 @@
         "es-ES": "seguro de cambio fijo",
         "zh-CN": "固定锁汇",
         "pl-PL": "forward klasyczny",
-        "el-GR": "Fixed Προθεσμιακό"
+        "el-GR": "Fixed Προθεσμιακό",
+        "pt-PT": "forward fixo"
     },
     "flexible forward take-up": {
         "en-GB": "flexible forward take-up",
@@ -427,7 +456,8 @@
         "es-ES": "ejecución de seguro de cambio flexible",
         "zh-CN": "取用动态锁汇",
         "pl-PL": "Elastyczne rozliczenie",
-        "el-GR": "Ανάληψη απο προθεσμιακό"
+        "el-GR": "Ανάληψη απο προθεσμιακό",
+        "pt-PT": "utilização de forward flexível"
     },
     "use flexible forward": {
         "en-GB": "use flexible forward",
@@ -442,7 +472,8 @@
         "es-ES": "utilizar seguros de cambio flexible",
         "zh-CN": "使用灵活锁汇",
         "pl-PL": "Wykorzystaj forward elastyczny",
-        "el-GR": "Χρήση προθεσμιακού συμβολαίου"
+        "el-GR": "Χρήση προθεσμιακού συμβολαίου",
+        "pt-PT": "utilizar forward flexível"
     },
     "invoice assistant": {
         "en-GB": "Invoice Assistant",
@@ -457,6 +488,7 @@
         "es-ES": "Invoice Assistant",
         "zh-CN": "Invoice Assistant",
         "pl-PL": "Invoice Assistant",
-        "el-GR": "Invoice Assistant"
+        "el-GR": "Invoice Assistant",
+        "pt-PT": "Invoice Assistant"
     }
 }

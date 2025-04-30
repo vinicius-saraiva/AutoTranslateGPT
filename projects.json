@@ -1,3 +1,16 @@
 {
-  "projects": []
+  "projects": [
+    {
+      "name": "Payments List",
+      "readOnlyKey": "mFrDl9ZkCIQqcuMEdffDTlo4iivVXZpK",
+      "writeKey": "N",
+      "lastUsed": "2025-04-30T18:44:36.195Z"
+    },
+    {
+      "name": "New Platform Emails",
+      "readOnlyKey": "zhCVswr5Nc216X2_htsYB0fmZ-0TWXZD",
+      "writeKey": "a",
+      "lastUsed": "2025-04-30T19:16:08.739Z"
+    }
+  ]
 }

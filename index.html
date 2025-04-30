@@ -155,6 +155,9 @@
                         <button type="button" class="lang-button" data-lang="zh-CN" title="Chinese">
                             <img src="https://flagcdn.com/w20/cn.png" alt="Chinese">
                         </button>
+                        <button type="button" class="lang-button" data-lang="pt-PT" title="Portuguese">
+                            <img src="https://flagcdn.com/w20/pt.png" alt="Portuguese">
+                        </button>
                     </div>
                 </div>
                 <div class="checkbox-group">
@@ -217,6 +220,9 @@
                         <!-- East Asian languages -->
                         <button type="button" class="lang-button" data-lang="zh-CN" title="Chinese">
                             <img src="https://flagcdn.com/w20/cn.png" alt="Chinese">
+                        </button>
+                        <button type="button" class="lang-button" data-lang="pt-PT" title="Portuguese">
+                            <img src="https://flagcdn.com/w20/pt.png" alt="Portuguese">
                         </button>
                     </div>
                 </div>
@@ -325,12 +331,79 @@
                     <label for="openaiApiKey">OpenAI API Key</label>
                     <input type="password" id="openaiApiKey" placeholder="Enter your OpenAI API key">
                 </div>
+                <div class="prompt-section">
+                    <div class="prompt-header">
+                        <h3>Translation Prompt</h3>
+                        <div class="prompt-controls">
+                            <button id="togglePrompt" class="icon-button" title="Show/Hide Prompt">
+                                <span class="material-icons">visibility</span>
+                            </button>
+                            <button id="copyPrompt" class="icon-button" title="Copy Prompt">
+                                <span class="material-icons">content_copy</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="promptDisplay" class="prompt-display" style="display: none;">
+                        <pre id="promptContent"></pre>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
                 <button id="saveApiKeys" class="save-btn">Save Configuration</button>
             </div>
         </div>
     </div>
+
+    <style>
+        .prompt-section {
+            margin-top: 20px;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .prompt-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .prompt-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .prompt-display {
+            background: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 15px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .prompt-display pre {
+            margin: 0;
+            white-space: pre-wrap;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        /* Make these styles specific to the prompt section */
+        .prompt-section .icon-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 5px;
+            color: #666;
+            transition: color 0.2s;
+        }
+
+        .prompt-section .icon-button:hover {
+            color: #333;
+        }
+    </style>
 
     <!-- Replace the existing project modal HTML -->
     <div id="projectModal" class="modal">
@@ -504,7 +577,7 @@
         const supportedLanguages = [
             'en-GB', 'de-DE', 'nl-NL', 'fr-FR', 'es-ES', 
             'it-IT', 'ro-RO', 'cs-CZ', 'bg-BG', 'el-GR', 
-            'hu-HU', 'zh-CN', 'pl-PL'
+            'hu-HU', 'zh-CN', 'pl-PL', 'pt-PT'
         ];
 
         function getNextLanguage(currentLang) {
@@ -1289,7 +1362,7 @@
             const supportedLanguages = [
                 'en-GB', 'de-DE', 'nl-NL', 'fr-FR', 'es-ES', 
                 'it-IT', 'ro-RO', 'cs-CZ', 'bg-BG', 'el-GR', 
-                'hu-HU', 'zh-CN', 'pl-PL'
+                'hu-HU', 'zh-CN', 'pl-PL', 'pt-PT'
             ];
 
             function getNextLanguage(currentLang) {
@@ -1500,7 +1573,8 @@
                 'es-ES': 'es-ES',
                 'zh-CN': 'zh-CN',
                 'pl-PL': 'pl-PL',
-                'el-GR': 'el-GR'
+                'el-GR': 'el-GR',
+                'pt-PT': 'pt-PT'
             };
 
             const langCode = langMapping[targetLang];
@@ -1548,6 +1622,55 @@
             return prompt;
         }
 
+        // Single source of truth for the prompt template
+        const PROMPT_TEMPLATE = `You are a professional translator for a B2B foreign exchange and cross-border payments platform. Translate to ${'${targetLang}'}.
+
+These translations are being imported from a translation management platform (Localise.biz) where each asset has a unique ID.
+The asset ID provides context about the UI element type (Button/CTA, Title, Label, Error, etc).
+
+Important rules:
+1. ${'${glossaryPrompt}'}
+2. Adapt the case, gender, number, and declination of any glossary terms for grammatical correctness
+3. CRITICAL: Variables must be preserved EXACTLY as they appear, including the underscores:
+   - __variable__ → Keep as __variable__ (e.g., "__total__" should stay as "__total__")
+   - %variable% → Keep as %variable%
+   - %%variable%% → Keep as %%variable%%
+   - {{variable}} → Keep as {{variable}}
+4. ONLY include HTML tags that exist in the original text - DO NOT add new ones
+5. Keep existing HTML tags (<br>, <p>, etc.) exactly as they appear
+6. You must keep at all costs the "/n" and "/t" as they are in the original text like the following example "add a beneficiary in the platform. \n \n If you did not initiate this action"
+7. DO NOT translate: HTML tags, URLs, date formats like DD/MM/YYYY HH:mm or similar
+8. Use terminology and phrasing that is the most commonly used by fintechs and banks in ${'${targetLang}'}, prioritizing clarity and naturalness for business clients. When multiple correct translations exist, prefer the one most frequently used in the financial and FX industry.  
+9. Prefer terminology commonly used by leading fintech and FX providers such as **Wise, Revolut, and iBanFirst** to ensure industry consistency.  
+10. NEVER include the asset ID in your translation. Only return the translated text itself.
+Context: The platform handles currency conversion, international payments, and financial operations for business clients.
+
+Asset ID: ${'${key}'}
+Text to translate: ${'${text}'}
+`;
+
+        // Function to fill in the template with real values
+        function generateTranslationPrompt(text, targetLang, key) {
+            const glossaryPrompt = getGlossaryPrompt(text, targetLang);
+            return PROMPT_TEMPLATE
+                .replace(/\$\{text\}/g, text)
+                .replace(/\$\{targetLang\}/g, targetLang)
+                .replace(/\$\{key\}/g, key)
+                .replace(/\$\{glossaryPrompt\}/g, glossaryPrompt);
+        }
+
+        // Show the raw prompt template in the modal
+        document.addEventListener('DOMContentLoaded', () => {
+            const configureBtn = document.getElementById('configureBtn');
+            const promptContent = document.getElementById('promptContent');
+            if (configureBtn && promptContent) {
+                configureBtn.addEventListener('click', () => {
+                    promptContent.textContent = PROMPT_TEMPLATE;
+                });
+            }
+        });
+
+        // Update the translateText function to use the new prompt generation
         async function translateText(text, targetLang, key) {
             try {
                 // Ensure OpenAI client is initialized
@@ -1555,39 +1678,19 @@
                     initializeOpenAIClient();
                 }
                 
-                // Get glossary prompt
-                const glossaryPrompt = getGlossaryPrompt(text, targetLang);
+                const prompt = generateTranslationPrompt(text, targetLang, key);
+                
+                // Update the prompt display if the modal is open
+                const promptContent = document.getElementById('promptContent');
+                if (promptContent) {
+                    promptContent.textContent = prompt;
+                }
                 
                 const completion = await openaiClient.chat.completions.create({
                     messages: [
                         {
                             role: "system",
-                            content: `You are a professional translator for a B2B foreign exchange and cross-border payments platform. Translate to ${targetLang}.
-                            
-                            These translations are being imported from a translation management platform (Localise.biz) where each asset has a unique ID.
-                            The asset ID provides context about the UI element type (Button/CTA, Title, Label, Error, etc).
-                            
-                            Important rules:
-                            1. ${glossaryPrompt}
-                            2. Adapt the case, gender, number, and declination of any glossary terms for grammatical correctness
-                            3. CRITICAL: Variables must be preserved EXACTLY as they appear, including the underscores:
-                               - __variable__ → Keep as __variable__ (e.g., "__total__" should stay as "__total__")
-                               - %variable% → Keep as %variable%
-                               - %%variable%% → Keep as %%variable%%
-                               - {{variable}} → Keep as {{variable}}
-                            4. ONLY include HTML tags that exist in the original text - DO NOT add new ones
-                            5. Keep existing HTML tags (<br>, <p>, etc.) exactly as they appear
-                            6. You must keep at all costs the "/n" and "/t" as they are in the original text like the following example "add a beneficiary in the platform. \n \n If you did not initiate this action"
-                            7. DO NOT translate: HTML tags, URLs, date formats like DD/MM/YYYY HH:mm or similar
-                            8. Use terminology and phrasing that is the most commonly used by fintechs and banks in ${targetLang}, prioritizing clarity and naturalness for business clients. When multiple correct translations exist, prefer the one most frequently used in the financial and FX industry.  
-                            9. Prefer terminology commonly used by leading fintech and FX providers such as **Wise, Revolut, and iBanFirst** to ensure industry consistency.  
-                            10. NEVER include the asset ID in your translation. Only return the translated text itself.
-                            Context: The platform handles currency conversion, international payments, and financial operations for business clients.`
-                        },
-                        {
-                            role: "user",
-                            content: `Asset ID: ${key}
-                            Text to translate: ${text}`
+                            content: prompt
                         }
                     ],
                     model: "gpt-4o",
@@ -1595,10 +1698,7 @@
                 });
 
                 let translatedText = completion.choices[0].message.content.trim();
-                
-                // Remove "The text to translate is:" if it appears in the response
                 translatedText = translatedText.replace(/^The text to translate is:\s*/i, '');
-                
                 return translatedText;
             } catch (error) {
                 console.error('Translation error:', error);
@@ -1620,7 +1720,8 @@
             'el-GR': 'ell',  // Greek
             'hu-HU': 'hun',  // Hungarian
             'zh-CN': 'cmn',   // Chinese
-            'pl-PL': 'pol'   // Polish
+            'pl-PL': 'pol',   // Polish
+            'pt-PT': 'por'    // Portuguese
         };
 
         // Add language detection function
@@ -1801,7 +1902,124 @@
         });
 
         // Load projects on page load
-        document.addEventListener('DOMContentLoaded', loadProjects);
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                await loadProjects();
+                
+                // Only try to load a project if one is selected
+                const selectedProject = projectSelect.value;
+                if (selectedProject) {
+                    await loadProject(selectedProject);
+                }
+            } catch (error) {
+                console.error('Error during initial load:', error);
+                showStatus('Error loading projects: ' + error.message, 'error');
+            }
+        });
+
+        // Add loadProject function
+        async function loadProject(readOnlyKey) {
+            try {
+                // Get the project details
+                const response = await fetch('/api/projects');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch projects');
+                }
+                const data = await response.json();
+                console.log('Received projects data:', data); // Debug log
+
+                // Handle both possible response formats
+                const projects = data.projects || data;
+                
+                if (!projects || !Array.isArray(projects)) {
+                    console.error('Invalid projects data structure:', projects);
+                    throw new Error('Invalid projects data structure');
+                }
+
+                const project = projects.find(p => p.readOnlyKey === readOnlyKey);
+                
+                if (!project) {
+                    throw new Error('Project not found');
+                }
+
+                // Update the API key input field
+                document.getElementById('locoApiKey').value = project.readOnlyKey;
+                
+                // Update last used timestamp using PUT endpoint
+                const updateResponse = await fetch(`/api/projects/${encodeURIComponent(project.name)}`, {
+                    method: 'PUT',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        lastUsed: new Date().toISOString()
+                    })
+                });
+                
+                if (!updateResponse.ok) {
+                    throw new Error('Failed to update project timestamp');
+                }
+                
+                // Show success message
+                showStatus(`Project "${project.name}" loaded successfully`, 'success');
+                
+                // Enable the start button if we have all required fields
+                const startBtn = document.getElementById('startBtn');
+                const openaiApiKey = localStorage.getItem('openaiApiKey');
+                const targetLang = getSelectedLanguage('targetLangGrid');
+                const sourceLang = getSelectedLanguage('sourceLangGrid');
+                
+                startBtn.disabled = !(openaiApiKey && targetLang && sourceLang);
+                
+            } catch (error) {
+                console.error('Error loading project:', error);
+                showStatus('Error loading project: ' + error.message, 'error');
+            }
+        }
+
+        // Update project selection handler
+        projectSelect.addEventListener('change', async (e) => {
+            const readOnlyKey = e.target.value;
+            if (readOnlyKey) {
+                await loadProject(readOnlyKey);
+            } else {
+                // Clear the API key field if no project is selected
+                document.getElementById('locoApiKey').value = '';
+                showStatus('No project selected', 'info');
+            }
+        });
+
+        // Add readProjects and writeProjects functions
+        async function readProjects() {
+            try {
+                const response = await fetch('/api/projects');
+                if (!response.ok) {
+                    throw new Error('Failed to fetch projects');
+                }
+                return await response.json();
+            } catch (error) {
+                console.error('Error reading projects:', error);
+                throw error;
+            }
+        }
+
+        async function writeProjects(projects) {
+            try {
+                const response = await fetch('/api/projects', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(projects)
+                });
+                if (!response.ok) {
+                    throw new Error('Failed to save projects');
+                }
+            } catch (error) {
+                console.error('Error writing projects:', error);
+                throw error;
+            }
+        }
 
         // Add download all button handler - keeping language codes
         const downloadAllBtn = document.getElementById('downloadAllBtn');
@@ -1944,6 +2162,35 @@
         }
 
         // ... rest of your existing code ...
+
+        // Load projects on page load
+        document.addEventListener('DOMContentLoaded', loadProjects);
+
+        // Add prompt display controls
+        document.addEventListener('DOMContentLoaded', () => {
+            const togglePromptBtn = document.getElementById('togglePrompt');
+            const copyPromptBtn = document.getElementById('copyPrompt');
+            const promptDisplay = document.getElementById('promptDisplay');
+            
+            togglePromptBtn.addEventListener('click', () => {
+                const isVisible = promptDisplay.style.display !== 'none';
+                promptDisplay.style.display = isVisible ? 'none' : 'block';
+                togglePromptBtn.querySelector('.material-icons').textContent = 
+                    isVisible ? 'visibility' : 'visibility_off';
+            });
+            
+            copyPromptBtn.addEventListener('click', () => {
+                const promptContent = document.getElementById('promptContent');
+                navigator.clipboard.writeText(promptContent.textContent)
+                    .then(() => {
+                        showStatus('Prompt copied to clipboard', 'success');
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy prompt:', err);
+                        showStatus('Failed to copy prompt', 'error');
+                    });
+            });
+        });
     </script> 
 </body>
 </html> 
