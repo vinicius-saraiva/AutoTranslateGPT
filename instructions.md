@@ -1,3 +1,9 @@
+# INDY.tradutor - AI Translation Tool
+
+# (All documentation and instructions related to the modular reorganization, new file structure, and professionalization have been removed as requested.)
+
+# Please refer to your previous working instructions or documentation for the original setup and usage.
+
 # API Setup
 
 Consider a user who is using the web app for the first time.

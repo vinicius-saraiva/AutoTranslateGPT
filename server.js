@@ -53,6 +53,18 @@ app.get('/styles.css', (req, res) => {
     res.sendFile(join(__dirname, 'styles.css'));
 });
 
+// Explicitly serve the script.js file
+app.get('/script.js', (req, res) => {
+    res.setHeader('Content-Type', 'application/javascript');
+    res.sendFile(join(__dirname, 'script.js'));
+});
+
+// Serve language-facts.txt
+app.get('/language-facts.txt', (req, res) => {
+    res.setHeader('Content-Type', 'text/plain');
+    res.sendFile(join(__dirname, 'language-facts.txt'));
+});
+
 // Proxy endpoint for Localise
 app.get('/api/translations', async (req, res) => {
     const apiKey = req.query.key;
@@ -139,10 +151,17 @@ async function readProjects() {
     const projectsPath = join(__dirname, 'projects.json');
     try {
         const data = await fs.readFile(projectsPath, 'utf8');
-        return JSON.parse(data);
+        if (!data || data.trim() === '') {
+            throw new Error('projects.json is empty');
+        }
+        const parsed = JSON.parse(data);
+        if (!parsed.projects || !Array.isArray(parsed.projects)) {
+            throw new Error('projects.json is not in the expected format');
+        }
+        return parsed;
     } catch (error) {
         console.error('Error reading projects:', error);
-        throw new Error('Failed to read projects');
+        throw new Error('Failed to read projects: ' + error.message);
     }
 }
 
@@ -176,10 +195,10 @@ app.get('/api/projects', async (req, res) => {
 
 app.post('/api/projects', async (req, res) => {
     try {
-        const { name, readOnlyKey, writeKey } = req.body;
+        const { name, readOnlyKey } = req.body;
         
         // Validate inputs
-        if (!name || !readOnlyKey || !writeKey) {
+        if (!name || !readOnlyKey) {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
@@ -193,9 +212,7 @@ app.post('/api/projects', async (req, res) => {
         // Add new project
         projects.push({
             name,
-            readOnlyKey,
-            writeKey,
-            lastUsed: new Date().toISOString()
+            readOnlyKey
         });
 
         await writeProjects({ projects });
@@ -217,11 +234,13 @@ app.put('/api/projects/:name', async (req, res) => {
             return res.status(404).json({ error: 'Project not found' });
         }
 
-        // Update project
-        projects[index] = { ...projects[index], ...updates };
+        // Only update provided fields, preserve others (but never set lastUsed)
+        const { lastUsed, ...safeUpdates } = updates;
+        projects[index] = { ...projects[index], ...safeUpdates };
         await writeProjects({ projects });
         res.json({ success: true });
     } catch (error) {
+        console.error('Error updating project:', error);
         res.status(500).json({ error: error.message });
     }
 });

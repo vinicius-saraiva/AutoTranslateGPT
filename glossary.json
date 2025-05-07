@@ -490,5 +490,21 @@
         "pl-PL": "Invoice Assistant",
         "el-GR": "Invoice Assistant",
         "pt-PT": "Invoice Assistant"
+    },
+    "sort code": {
+        "en-GB": "sort code",
+        "fr-FR": "sort code",
+        "de-DE": "sort code",
+        "nl-NL": "sort code",
+        "it-IT": "sort code",
+        "hu-HU": "sort code",
+        "cs-CZ": "sort code",
+        "ro-RO": "sort code",
+        "bg-BG": "sort code",
+        "es-ES": "sort code",
+        "zh-CN": "sort code",
+        "pl-PL": "sort code",
+        "el-GR": "sort code",
+        "pt-PT": "sort code"
     }
 }

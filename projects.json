@@ -2,15 +2,63 @@
   "projects": [
     {
       "name": "Payments List",
-      "readOnlyKey": "mFrDl9ZkCIQqcuMEdffDTlo4iivVXZpK",
-      "writeKey": "N",
-      "lastUsed": "2025-04-30T18:44:36.195Z"
+      "readOnlyKey": "mFrDl9ZkCIQqcuMEdffDTlo4iivVXZpK"
     },
     {
       "name": "New Platform Emails",
-      "readOnlyKey": "zhCVswr5Nc216X2_htsYB0fmZ-0TWXZD",
-      "writeKey": "a",
-      "lastUsed": "2025-04-30T19:30:21.710Z"
+      "readOnlyKey": "zhCVswr5Nc216X2_htsYB0fmZ-0TWXZD"
+    },
+    {
+      "name": "Common translations",
+      "readOnlyKey": "uFHGcUii5mggbGEEwEl_IO5ExmIItV3-"
+    },
+    {
+      "name": "[Common] iBanFirst",
+      "readOnlyKey": "GUhmlUeKqhTebOwxt6-r7yBYxkGZYKFq"
+    },
+    {
+      "name": "[Accounts] Powens",
+      "readOnlyKey": "YXNXie7gseLmnBmPDfwDrtkFrhqwCQsq"
+    },
+    {
+      "name": "[Payments] Multi Signature",
+      "readOnlyKey": "iATvkzg-4hFgKsva3t_8Ux_cnGQt4IBl"
+    },
+    {
+      "name": "[Login] iBanFirst",
+      "readOnlyKey": "m_UD1-DUTbt6243c7iNxTaa_uvJ9SjFg"
+    },
+    {
+      "name": "[Payments] Import Beneficiaries",
+      "readOnlyKey": "ptWpxYCXnXmyHPglb0Brs61FQOPvVp2H"
+    },
+    {
+      "name": "[Accounts] List/Details",
+      "readOnlyKey": "4ipAPoBPdxt6H6tevrVN9_VaZqwznPzZ"
+    },
+    {
+      "name": "[Hedging] Empty State",
+      "readOnlyKey": "9MAR5gZK4B8DdjWDczmCc_EEAOgcwsRx"
+    },
+    {
+      "name": "Assistant",
+      "readOnlyKey": "F8e6HLqyiXSu76uUigJKKlYSUciwpl61"
+    },
+    {
+      "name": "Payment Tracker",
+      "readOnlyKey": "vL_vUwwXJdsGyRd3GKNZaoTw9_EEKAb6"
+    },
+    {
+      "name": "[Register] iBanFirst",
+      "readOnlyKey": "Ac4QMt4P2LO5mtQuRTp0gGA3CArlj5C3"
+    },
+    {
+      "name": "iBanFirst Companion",
+      "readOnlyKey": "B0k2SxAFjq_vOB0Nv-ElEhLKCfztdm6f"
+    },
+    {
+      "name": "Full Platform",
+      "readOnlyKey": "cbd4oeJDCFc_iNmsg4SpWVfdGKLxBXEN"
     }
   ]
 }
