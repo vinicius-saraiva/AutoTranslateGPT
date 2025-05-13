@@ -48,10 +48,20 @@
         "pt-PT": "conta"
     },
     "beneficiary": {
-        "en-GB": "beneficiary",
-        "pl-PL": "Beneficjent",
+        "fr-FR": "Bénéficiaire",
+        "en-GB": "Beneficiary",
+        "nl-NL": "Begunstigde",
+        "de-DE": "Begünstigter",
+        "it-IT": "Beneficiario",
+        "hu-HU": "Kedvezményezett",
+        "cs-CZ": "Příjemce",
+        "ro-RO": "Beneficiar",
+        "bg-BG": "Бенефициент",
+        "es-ES": "Beneficiario",
+        "zh-CN": "收款人",
+        "pl-PL": "Odbiorca",
         "el-GR": "Δικαιούχος",
-        "pt-PT": "beneficiário"
+        "pt-PT": "Beneficiário"
     },
     "payment": {
         "en-GB": "payment",

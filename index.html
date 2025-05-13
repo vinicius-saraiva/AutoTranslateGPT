@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>INDY - AI Translator</title>
+    <title>INDY Translate</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -23,7 +23,7 @@
                     <path transform="translate(760,1811)" d="m0 0"/>
                     <path transform="translate(780,1203)" d="m0 0"/>
                 </svg>
-                <span class="logo-text" style="cursor: pointer;">INDY.tradutor</span>
+                <span class="logo-text" style="cursor: pointer;">INDY Translate</span>
             </div>
             <div class="header-controls">
                 <div class="api-input-group">
@@ -34,9 +34,18 @@
                         <span class="material-icons">add</span>
                     </button>
                 </div>
-                <button id="configureBtn" class="icon-button" title="Configuration">
-                    <span class="material-icons">settings</span>
-                </button>
+                <div class="header-divider"></div>
+                <div class="header-buttons">
+                    <button id="manualModeBtn" class="icon-button" title="Manual Mode">
+                        <span class="material-icons">translate</span>
+                    </button>
+                    <button id="glossaryBtn" class="icon-button" title="Glossary">
+                        <span class="material-icons">menu_book</span>
+                    </button>
+                    <button id="configureBtn" class="icon-button" title="Settings">
+                        <span class="material-icons">settings</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -172,6 +181,13 @@
                         </button>
                     </div>
                 </div>
+                <div class="checkbox-group translate-all-group">
+                    <label>
+                        <input type="checkbox" id="translateAll">
+                        <span class="material-icons translate-icon">language</span>
+                        <span class="translate-label">Translate to all target languages at once</span>
+                    </label>
+                </div>
                 <div class="checkbox-group">
                     <label>
                         <input type="checkbox" id="ignoreTranslated">
@@ -182,12 +198,6 @@
                     <label>
                         <input type="checkbox" id="onlyEmpty">
                         Only translate empty entries
-                    </label>
-                </div>
-                <div class="checkbox-group">
-                    <label>
-                        <input type="checkbox" id="translateAll">
-                        Translate to all target languages at once
                     </label>
                 </div>
                 <div class="filter-group">
@@ -269,7 +279,7 @@
     <div id="apiModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Configuration</h2>
+                <h2>Settings</h2>
                 <button class="close-modal">&times;</button>
             </div>
             <div class="modal-body">
@@ -300,10 +310,25 @@
         </div>
     </div>
 
+    <div id="glossaryModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Glossary</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Glossary content will go here -->
+            </div>
+        </div>
+    </div>
+
     <div id="projectModal" class="modal">
         <div class="modal-content">
             <div class="modal-header">
-                <h2>Project Configuration</h2>
+                <div class="modal-title-group">
+                    <h2>Localise.biz Project Integration</h2>
+                    <a href="https://localise.biz/" target="_blank" class="modal-link">https://localise.biz/</a>
+                </div>
                 <button class="close-modal">&times;</button>
             </div>
             <div class="modal-body">
@@ -332,6 +357,135 @@
                 <span class="material-icons">cloud_upload</span>
             </button>
         </form>
+    </div>
+
+    <!-- Add the Manual Mode Modal -->
+    <div id="manualModeModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Manual Mode</h2>
+                <button class="close-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="manual-setup-grid">
+                    <div class="manual-setup-column">
+                        <div class="manual-mode-section">
+                            <h4>Source Language:</h4>
+                            <div class="language-grid" id="manualSourceLangGrid">
+                                <!-- Flags copied from sourceLangGrid -->
+                                <button type="button" class="lang-button" data-lang="en-GB" title="English">
+                                    <img src="https://flagcdn.com/w20/gb.png" alt="English">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="de-DE" title="German">
+                                    <img src="https://flagcdn.com/w20/de.png" alt="German">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="nl-NL" title="Dutch">
+                                    <img src="https://flagcdn.com/w20/nl.png" alt="Dutch">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="fr-FR" title="French">
+                                    <img src="https://flagcdn.com/w20/fr.png" alt="French">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="es-ES" title="Spanish">
+                                    <img src="https://flagcdn.com/w20/es.png" alt="Spanish">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="it-IT" title="Italian">
+                                    <img src="https://flagcdn.com/w20/it.png" alt="Italian">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="ro-RO" title="Romanian">
+                                    <img src="https://flagcdn.com/w20/ro.png" alt="Romanian">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="cs-CZ" title="Czech">
+                                    <img src="https://flagcdn.com/w20/cz.png" alt="Czech">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="bg-BG" title="Bulgarian">
+                                    <img src="https://flagcdn.com/w20/bg.png" alt="Bulgarian">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="pl-PL" title="Polish">
+                                    <img src="https://flagcdn.com/w20/pl.png" alt="Polish">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="el-GR" title="Greek">
+                                    <img src="https://flagcdn.com/w20/gr.png" alt="Greek">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="hu-HU" title="Hungarian">
+                                    <img src="https://flagcdn.com/w20/hu.png" alt="Hungarian">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="zh-CN" title="Chinese">
+                                    <img src="https://flagcdn.com/w20/cn.png" alt="Chinese">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="pt-PT" title="Portuguese">
+                                    <img src="https://flagcdn.com/w20/pt.png" alt="Portuguese">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="manual-mode-section">
+                            <h4>Context (optional):</h4>
+                            <textarea id="manualContextInput" class="context-input" rows="4" style="width:100%;resize:vertical;" placeholder="e.g., 'text for a button', 'help desk article', etc."></textarea>
+                        </div>
+                        <div class="manual-mode-section">
+                            <h4>Text to Translate:</h4>
+                            <textarea id="manualInputText" rows="4" style="width:100%;resize:vertical;" placeholder="Enter text to translate..."></textarea>
+                        </div>
+                        <div class="manual-mode-section" style="text-align:center;margin-top:20px;">
+                            <button id="manualTranslateBtn" class="primary-btn" disabled>Translate</button>
+                        </div>
+                    </div>
+                    <div class="manual-setup-column">
+                        <div class="manual-mode-section">
+                            <h4>Target Language:</h4>
+                            <div class="language-grid" id="manualTargetLangGrid">
+                                <!-- Flags copied from targetLangGrid -->
+                                <button type="button" class="lang-button" data-lang="en-GB" title="English">
+                                    <img src="https://flagcdn.com/w20/gb.png" alt="English">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="de-DE" title="German">
+                                    <img src="https://flagcdn.com/w20/de.png" alt="German">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="nl-NL" title="Dutch">
+                                    <img src="https://flagcdn.com/w20/nl.png" alt="Dutch">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="fr-FR" title="French">
+                                    <img src="https://flagcdn.com/w20/fr.png" alt="French">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="es-ES" title="Spanish">
+                                    <img src="https://flagcdn.com/w20/es.png" alt="Spanish">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="it-IT" title="Italian">
+                                    <img src="https://flagcdn.com/w20/it.png" alt="Italian">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="ro-RO" title="Romanian">
+                                    <img src="https://flagcdn.com/w20/ro.png" alt="Romanian">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="cs-CZ" title="Czech">
+                                    <img src="https://flagcdn.com/w20/cz.png" alt="Czech">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="bg-BG" title="Bulgarian">
+                                    <img src="https://flagcdn.com/w20/bg.png" alt="Bulgarian">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="pl-PL" title="Polish">
+                                    <img src="https://flagcdn.com/w20/pl.png" alt="Polish">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="el-GR" title="Greek">
+                                    <img src="https://flagcdn.com/w20/gr.png" alt="Greek">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="hu-HU" title="Hungarian">
+                                    <img src="https://flagcdn.com/w20/hu.png" alt="Hungarian">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="zh-CN" title="Chinese">
+                                    <img src="https://flagcdn.com/w20/cn.png" alt="Chinese">
+                                </button>
+                                <button type="button" class="lang-button" data-lang="pt-PT" title="Portuguese">
+                                    <img src="https://flagcdn.com/w20/pt.png" alt="Portuguese">
+                                </button>
+                            </div>
+                        </div>
+                        <div class="manual-mode-section">
+                            <h4>Translation Result:</h4>
+                            <textarea id="manualOutputText" rows="4" style="width:100%;resize:vertical;" readonly placeholder="Translation will appear here..."></textarea>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 
 </body>

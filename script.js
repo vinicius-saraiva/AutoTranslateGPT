@@ -150,9 +150,9 @@ window.currentData = {
 window.openaiClient = null;
 
 window.supportedLanguages = [
-    'en-GB', 'de-DE', 'nl-NL', 'fr-FR', 'es-ES', 
-    'it-IT', 'ro-RO', 'cs-CZ', 'bg-BG', 'el-GR', 
-    'hu-HU', 'zh-CN', 'pl-PL', 'pt-PT'
+    'en-GB', 'de-DE', 'nl-NL', 'fr-FR', 'es-ES',
+    'it-IT', 'ro-RO', 'cs-CZ', 'bg-BG', 'pl-PL',
+    'el-GR', 'hu-HU', 'zh-CN', 'pt-PT'
 ];
 
 // Add this function to initialize OpenAI client
@@ -260,9 +260,9 @@ function loadSavedPreferences() {
 
 // Define all necessary functions
 const supportedLanguages = [
-    'en-GB', 'de-DE', 'nl-NL', 'fr-FR', 'es-ES', 
-    'it-IT', 'ro-RO', 'cs-CZ', 'bg-BG', 'el-GR', 
-    'hu-HU', 'zh-CN', 'pl-PL', 'pt-PT'
+    'en-GB', 'de-DE', 'nl-NL', 'fr-FR', 'es-ES',
+    'it-IT', 'ro-RO', 'cs-CZ', 'bg-BG', 'pl-PL',
+    'el-GR', 'hu-HU', 'zh-CN', 'pt-PT'
 ];
 
 function getNextLanguage(currentLang) {
@@ -956,13 +956,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('openaiApiKey').removeEventListener('focus', function() {});
     document.getElementById('openaiApiKey').removeEventListener('blur', function() {});
 
-    // Update save handler to use full key
+    // Update save handler to use classList
     saveApiKeysBtn.addEventListener('click', () => {
         const openaiInput = document.getElementById('openaiApiKey');
         const openaiKey = openaiInput.value;
         
         localStorage.setItem('openaiApiKey', openaiKey);
-        modal.style.display = 'none';
+        modal.classList.remove('show');
         
         // Reinitialize OpenAI client with new key
         openaiClient = new OpenAI({
@@ -974,12 +974,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     closeBtn.addEventListener('click', () => {
-        modal.style.display = 'none';
+        modal.classList.remove('show');
     });
 
     window.addEventListener('click', (e) => {
         if (e.target === modal) {
-            modal.style.display = 'none';
+            modal.classList.remove('show');
         }
     });
 
@@ -1035,9 +1035,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Add these functions before setupNavigationButtons
     const supportedLanguages = [
-        'en-GB', 'de-DE', 'nl-NL', 'fr-FR', 'es-ES', 
-        'it-IT', 'ro-RO', 'cs-CZ', 'bg-BG', 'el-GR', 
-        'hu-HU', 'zh-CN', 'pl-PL', 'pt-PT'
+        'en-GB', 'de-DE', 'nl-NL', 'fr-FR', 'es-ES',
+        'it-IT', 'ro-RO', 'cs-CZ', 'bg-BG', 'pl-PL',
+        'el-GR', 'hu-HU', 'zh-CN', 'pt-PT'
     ];
 
     function getNextLanguage(currentLang) {
@@ -1334,13 +1334,20 @@ Text to translate: ${'${text}'}
 `;
 
 // Function to fill in the template with real values
-function generateTranslationPrompt(text, targetLang, key) {
+function generateTranslationPrompt(text, targetLang, key, context = '') {
     const glossaryPrompt = getGlossaryPrompt(text, targetLang);
-    return PROMPT_TEMPLATE
+    let prompt = PROMPT_TEMPLATE
         .replace(/\$\{text\}/g, text)
         .replace(/\$\{targetLang\}/g, targetLang)
         .replace(/\$\{key\}/g, key)
         .replace(/\$\{glossaryPrompt\}/g, glossaryPrompt);
+
+    // Add context if provided (manual mode)
+    if (context) {
+        prompt = prompt.replace('Asset ID:', `Asset ID: \nElement: ${context}`);
+    }
+
+    return prompt;
 }
 
 // Show the raw prompt template in the modal
@@ -1355,7 +1362,7 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // Update the translateText function to use the new prompt generation
-async function translateText(text, targetLang, key) {
+async function translateText(text, targetLang, key, context = '') {
     try {
         // Ensure glossary is loaded
         if (!window.glossaryLoaded) {
@@ -1370,7 +1377,7 @@ async function translateText(text, targetLang, key) {
             initializeOpenAIClient();
         }
         
-        const prompt = generateTranslationPrompt(text, targetLang, key);
+        const prompt = generateTranslationPrompt(text, targetLang, key, context);
         
         // Update the prompt display if the modal is open
         const promptContent = document.getElementById('promptContent');
@@ -1878,4 +1885,199 @@ document.addEventListener('DOMContentLoaded', () => {
                 showStatus('Failed to copy prompt', 'error');
             });
     });
-}); 
+});
+
+// Add glossary modal handlers
+const glossaryModal = document.getElementById('glossaryModal');
+const glossaryBtn = document.getElementById('glossaryBtn');
+const glossaryCloseBtn = glossaryModal.querySelector('.close-modal');
+
+glossaryBtn.addEventListener('click', () => {
+    glossaryModal.classList.add('show');
+    const glossaryBody = glossaryModal.querySelector('.modal-body');
+    if (window.glossary) {
+        // Build collapsible list
+        let html = '<div class="glossary-list">';
+        for (const [term, translations] of Object.entries(window.glossary)) {
+            html += `
+                <div class="glossary-term">
+                    <div class="glossary-term-header" tabindex="0"><span class="arrow">&#9654;</span>${term}</div>
+                    <div class="glossary-term-body" style="display:none;">
+                        <table class="glossary-table">
+                            <tbody>
+                                ${Object.entries(translations).map(([lang, text]) =>
+                                    `<tr><td class="glossary-lang">${lang}</td><td class="glossary-translation">${text || '<em>(empty)</em>'}</td></tr>`
+                                ).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            `;
+        }
+        html += '</div>';
+        glossaryBody.innerHTML = html;
+
+        // Add expand/collapse logic
+        glossaryBody.querySelectorAll('.glossary-term-header').forEach(header => {
+            header.addEventListener('click', () => {
+                const body = header.nextElementSibling;
+                const expanded = body.style.display === 'block';
+                body.style.display = expanded ? 'none' : 'block';
+                header.classList.toggle('expanded', !expanded);
+            });
+            header.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    header.click();
+                }
+            });
+        });
+    } else {
+        glossaryBody.innerHTML = '<div>Glossary not loaded.</div>';
+    }
+});
+
+glossaryCloseBtn.addEventListener('click', () => {
+    glossaryModal.classList.remove('show');
+});
+
+glossaryModal.addEventListener('click', (e) => {
+    if (e.target === glossaryModal) {
+        glossaryModal.classList.remove('show');
+    }
+});
+
+// Add manual mode modal handlers
+const manualModeModal = document.getElementById('manualModeModal');
+const manualModeBtn = document.getElementById('manualModeBtn');
+const manualModeCloseBtn = manualModeModal.querySelector('.close-modal');
+
+manualModeBtn.addEventListener('click', () => {
+    manualModeModal.classList.add('show');
+});
+
+manualModeCloseBtn.addEventListener('click', () => {
+    manualModeModal.classList.remove('show');
+});
+
+// Close modal when clicking outside
+manualModeModal.addEventListener('click', (e) => {
+    if (e.target === manualModeModal) {
+        manualModeModal.classList.remove('show');
+    }
+});
+
+// === Manual Mode Functionality ===
+(function setupManualMode() {
+    const manualSourceLangGrid = document.getElementById('manualSourceLangGrid');
+    const manualTargetLangGrid = document.getElementById('manualTargetLangGrid');
+    const manualInputText = document.getElementById('manualInputText');
+    const manualOutputText = document.getElementById('manualOutputText');
+    const manualTranslateBtn = document.getElementById('manualTranslateBtn');
+    const manualContextInput = document.getElementById('manualContextInput');
+
+    let selectedSourceLang = null;
+    let selectedTargetLang = null;
+
+    // Load saved manual mode preferences
+    function loadManualModePreferences() {
+        try {
+            const prefs = JSON.parse(localStorage.getItem('manualModePreferences')) || {};
+            if (prefs.sourceLang) {
+                const btn = manualSourceLangGrid.querySelector(`.lang-button[data-lang="${prefs.sourceLang}"]`);
+                if (btn) {
+                    manualSourceLangGrid.querySelectorAll('.lang-button').forEach(b => b.dataset.selected = 'false');
+                    btn.dataset.selected = 'true';
+                    selectedSourceLang = prefs.sourceLang;
+                }
+            }
+            if (prefs.targetLang) {
+                const btn = manualTargetLangGrid.querySelector(`.lang-button[data-lang="${prefs.targetLang}"]`);
+                if (btn) {
+                    manualTargetLangGrid.querySelectorAll('.lang-button').forEach(b => b.dataset.selected = 'false');
+                    btn.dataset.selected = 'true';
+                    selectedTargetLang = prefs.targetLang;
+                }
+            }
+            // Load saved context if exists
+            if (prefs.context) {
+                manualContextInput.value = prefs.context;
+            }
+        } catch (e) {
+            // Ignore errors
+        }
+    }
+
+    // Save manual mode preferences
+    function saveManualModePreferences() {
+        localStorage.setItem('manualModePreferences', JSON.stringify({
+            sourceLang: selectedSourceLang,
+            targetLang: selectedTargetLang,
+            context: manualContextInput.value
+        }));
+    }
+
+    // Helper to update button enabled state
+    function updateManualTranslateBtn() {
+        manualTranslateBtn.disabled = !(
+            selectedSourceLang &&
+            selectedTargetLang &&
+            manualInputText.value.trim().length > 0
+        );
+    }
+
+    // Language selection logic for source
+    manualSourceLangGrid.querySelectorAll('.lang-button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            manualSourceLangGrid.querySelectorAll('.lang-button').forEach(b => b.dataset.selected = 'false');
+            btn.dataset.selected = 'true';
+            selectedSourceLang = btn.dataset.lang;
+            saveManualModePreferences();
+            updateManualTranslateBtn();
+        });
+    });
+
+    // Language selection logic for target
+    manualTargetLangGrid.querySelectorAll('.lang-button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            manualTargetLangGrid.querySelectorAll('.lang-button').forEach(b => b.dataset.selected = 'false');
+            btn.dataset.selected = 'true';
+            selectedTargetLang = btn.dataset.lang;
+            saveManualModePreferences();
+            updateManualTranslateBtn();
+        });
+    });
+
+    // Input text change
+    manualInputText.addEventListener('input', updateManualTranslateBtn);
+
+    // Context input change
+    manualContextInput.addEventListener('input', saveManualModePreferences);
+
+    // Translate button click
+    manualTranslateBtn.addEventListener('click', async () => {
+        const text = manualInputText.value.trim();
+        const context = manualContextInput.value.trim();
+        const targetLang = selectedTargetLang;
+        manualTranslateBtn.disabled = true;
+        manualTranslateBtn.textContent = 'Translating...';
+        manualOutputText.value = '';
+        try {
+            const result = await translateText(text, targetLang, '', context);
+            manualOutputText.value = result;
+        } catch (err) {
+            manualOutputText.value = 'Error: ' + (err.message || err);
+        } finally {
+            manualTranslateBtn.textContent = 'Translate';
+            updateManualTranslateBtn();
+        }
+    });
+
+    // Load preferences on page load
+    loadManualModePreferences();
+
+    // Also reload preferences when modal is opened (in case user changes them elsewhere)
+    const manualModeBtn = document.getElementById('manualModeBtn');
+    if (manualModeBtn) {
+        manualModeBtn.addEventListener('click', loadManualModePreferences);
+    }
+})(); 
